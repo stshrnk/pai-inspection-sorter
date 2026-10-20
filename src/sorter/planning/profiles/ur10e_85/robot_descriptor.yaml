@@ -1,0 +1,16 @@
+# Arm-only kinematics for the NVIDIA UR10e + Robotiq_2F_85 assembled variant.
+# Six-axis ordering follows the existing NVIDIA-derived UR10e configuration.
+# No geometry, mesh, or collision avoidance model is bundled in this profile.
+api_version: 1.0
+cspace:
+    - shoulder_pan_joint
+    - shoulder_lift_joint
+    - elbow_joint
+    - wrist_1_joint
+    - wrist_2_joint
+    - wrist_3_joint
+default_q: [0.0, -0.0005, 0.0, 0.0, 0.0, 0.0]
+acceleration_limits: [10, 10, 10, 10, 10, 10]
+jerk_limits: [10000, 10000, 10000, 10000, 10000, 10000]
+cspace_to_urdf_rules: []
+collision_spheres: []

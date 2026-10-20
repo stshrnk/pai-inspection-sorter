@@ -2,7 +2,7 @@
 from __future__ import annotations
 import os
 import numpy as np
-from pxr import Gf, UsdGeom, UsdLux, UsdShade, Sdf
+from pxr import Gf, Usd, UsdGeom, UsdLux, UsdShade, Sdf
 from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
 from isaacsim.core.api.materials import PhysicsMaterial, PreviewSurface
 from isaacsim.core.utils.stage import get_current_stage, add_reference_to_stage
@@ -12,6 +12,7 @@ from isaacsim.sensors.camera import Camera
 
 SOURCE = np.array([0.40, 0.55, 0.045])
 PART_SIZE = np.array([0.10, 0.0515, 0.06])
+PART_MASS = .20
 FLOOR_Z = 0.015
 TRAYS = {'good': np.array([-0.40, 0.55, FLOOR_Z]),
          'defect': np.array([-0.40, 0.22, FLOOR_Z]),
@@ -26,7 +27,46 @@ def _box(world, path, position, scale, color):
         position=np.array(position), scale=np.array(scale), size=1., color=np.array(color)))
 
 
-def create_scene(world, include_robot=True):
+def configure_gripper_physics(stage, robot_path='/ur', damping=2., max_force=8.,
+                              mimic_frequency=None, mimic_damping=None):
+    """Apply bounded, damped grasp dynamics as local session overrides.
+
+    Keep native mimic relationships unless explicitly overridden for an
+    experiment. GRIPPER_KEEP_NATIVE=1 preserves every asset dynamics setting.
+    NVIDIA source assets stay intact.
+    """
+    if os.environ.get('GRIPPER_KEEP_NATIVE','0')=='1':
+        print('[gripper-physics] preserving native asset dynamics',flush=True)
+        return
+    damping=float(os.environ.get('GRIPPER_DAMPING',damping))
+    max_force=float(os.environ.get('GRIPPER_MAX_FORCE',max_force))
+    if os.environ.get('GRIPPER_MIMIC_FREQUENCY'):
+        mimic_frequency=float(os.environ['GRIPPER_MIMIC_FREQUENCY'])
+    if os.environ.get('GRIPPER_MIMIC_DAMPING'):
+        mimic_damping=float(os.environ['GRIPPER_MIMIC_DAMPING'])
+    drives=[]; mimics=[]
+    for prim in Usd.PrimRange(stage.GetPrimAtPath(robot_path)):
+        if prim.GetName()=='finger_joint' and prim.HasAttribute('drive:angular:physics:stiffness'):
+            prim.GetAttribute('drive:angular:physics:damping').Set(float(damping))
+            prim.GetAttribute('drive:angular:physics:maxForce').Set(float(max_force))
+            drives.append({'path':str(prim.GetPath()),
+                'stiffness':prim.GetAttribute('drive:angular:physics:stiffness').Get(),
+                'damping':float(damping),'max_force':float(max_force)})
+        for attr in prim.GetAttributes():
+            name=attr.GetName()
+            if name.startswith('physxMimicJoint:') and name.endswith(':naturalFrequency'):
+                if mimic_frequency is not None: attr.Set(float(mimic_frequency))
+                mimics.append(str(prim.GetPath()))
+            elif name.startswith('physxMimicJoint:') and name.endswith(':dampingRatio'):
+                if mimic_damping is not None: attr.Set(float(mimic_damping))
+    if not drives:
+        raise RuntimeError('No driven finger_joint found in robot asset')
+    print('[gripper-physics] drives='+str(drives)+' mimic_joints='+str(len(mimics))+
+          ' mimic_frequency='+str(mimic_frequency if mimic_frequency is not None else 'native')+
+          ' damping_ratio='+str(mimic_damping if mimic_damping is not None else 'native'),flush=True)
+
+
+def create_scene(world, include_robot=True, robot_profile="robotiq85"):
     stage = get_current_stage()
     # Primitive ground avoids the default ground material's remote root discovery.
     world.scene.add_ground_plane(z_position=0., name='floor')
@@ -41,7 +81,7 @@ def create_scene(world, include_robot=True):
             _box(world, f'/World/{name}_wall{k}', [x+dx,y+dy,z+.02], [sx,sy,.04], colors[name])
     friction = PhysicsMaterial('/World/part_friction', static_friction=1.1, dynamic_friction=0.9, restitution=0.)
     part=world.scene.add(DynamicCuboid('/World/part', name='part', position=SOURCE.copy(),
-        size=1., scale=PART_SIZE, mass=.06, color=np.array([.63,.66,.70]), physics_material=friction))
+        size=1., scale=PART_SIZE, mass=PART_MASS, color=np.array([.63,.66,.70]), physics_material=friction))
     # VisualCuboid binds its material stronger than descendants by default.
     # Permit the child stain to override it with its own dark surface.
     UsdShade.MaterialBindingAPI(stage.GetPrimAtPath('/World/part')).GetDirectBindingRel().SetMetadata(
@@ -70,16 +110,23 @@ def create_scene(world, include_robot=True):
     camera.set_lens_aperture(0.)
     robot=None
     if include_robot:
-        asset=os.environ.get('ROBOT_USD', os.environ.get('ISAAC_ASSET_ROOT', ASSET_ROOT).rstrip('/')+ROBOT_ASSET)
-        print('[startup] robot reference begin', flush=True)
-        add_reference_to_stage(asset, '/ur')
-        print('[startup] robot reference ready', flush=True)
-        gripper=ParallelGripper(end_effector_prim_path='/ur/ee_link/robotiq_arg2f_base_link',
-            joint_prim_names=['finger_joint'], joint_opened_positions=np.array([0.]),
-            joint_closed_positions=np.array([.70]), action_deltas=None, use_mimic_joints=True)
-        robot=world.scene.add(SingleManipulator(prim_path='/ur', name='robot',
-            end_effector_prim_path='/ur/ee_link/robotiq_arg2f_base_link', gripper=gripper))
-        # Joint defaults are assigned after initialization when DOF count is known.
+        asset_root=os.environ.get('ISAAC_ASSET_ROOT',ASSET_ROOT)
+        print('[startup] robot reference begin profile='+robot_profile,flush=True)
+        if robot_profile=='robotiq85':
+            from .robot_profiles import create_robot
+            robot=create_robot(world,asset_root)
+        elif robot_profile=='legacy140':
+            asset=os.environ.get('ROBOT_USD',asset_root.rstrip('/')+ROBOT_ASSET)
+            add_reference_to_stage(asset,'/ur')
+            gripper=ParallelGripper(end_effector_prim_path='/ur/ee_link/robotiq_arg2f_base_link',
+                joint_prim_names=['finger_joint'],joint_opened_positions=np.array([0.]),
+                joint_closed_positions=np.array([.70]),action_deltas=None,use_mimic_joints=True)
+            robot=world.scene.add(SingleManipulator(prim_path='/ur',name='robot',
+                end_effector_prim_path='/ur/ee_link/robotiq_arg2f_base_link',gripper=gripper))
+            robot.sorter_profile='legacy140'
+        else: raise ValueError('Unknown robot profile')
+        print('[startup] robot reference ready',flush=True)
+        configure_gripper_physics(stage)
     return {'part':part,'camera':camera,'robot':robot,'patch':patch,'dome':dome,'key':key,
             'stain_material':stain_material}
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="ur10e_robotiq85_kinematics">
+  <!-- Arm kinematics reused from the existing NVIDIA-derived UR10e URDF; geometry deliberately omitted. -->
+  <joint name="ur_root_joint" type="fixed">
+    <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+    <parent link="ur" />
+    <child link="world" />
+  </joint>
+  <joint name="shoulder_pan_joint" type="revolute">
+    <origin xyz="0. 0. 0.1807" rpy="0. 0. -3.1415925" />
+    <parent link="world" />
+    <child link="shoulder_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-6.2831853" upper="6.2831853" effort="330." velocity="2.0943951" />
+  </joint>
+  <joint name="shoulder_lift_joint" type="revolute">
+    <origin xyz="0. 0. 0." rpy="1.5707964 0. 0. " />
+    <parent link="shoulder_link" />
+    <child link="upper_arm_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-6.2831853" upper="6.2831853" effort="330." velocity="2.0943951" />
+  </joint>
+  <joint name="elbow_joint" type="revolute">
+    <origin xyz="-0.6127 0. 0. " rpy="0. 0. 0." />
+    <parent link="upper_arm_link" />
+    <child link="forearm_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-3.1415927" upper="3.1415927" effort="150." velocity="3.1415927" />
+  </joint>
+  <joint name="wrist_1_joint" type="revolute">
+    <origin xyz="-0.57155 0. 0.17415" rpy="0. 0. 0." />
+    <parent link="forearm_link" />
+    <child link="wrist_1_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-6.2831853" upper="6.2831853" effort="56." velocity="3.1415927" />
+  </joint>
+  <joint name="wrist_2_joint" type="revolute">
+    <origin xyz="-0. -0.11985 0. " rpy="1.5707964 0. 0. " />
+    <parent link="wrist_1_link" />
+    <child link="wrist_2_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-6.2831853" upper="6.2831853" effort="56." velocity="3.1415927" />
+  </joint>
+  <joint name="wrist_3_joint" type="revolute">
+    <origin xyz="0. 0.11655 -0. " rpy="-1.5707964 -0.0000001 0.0000001" />
+    <parent link="wrist_2_link" />
+    <child link="wrist_3_link" />
+    <axis xyz="0. 0. 1." />
+    <limit lower="-6.2831853" upper="6.2831853" effort="56." velocity="3.1415927" />
+  </joint>
+  <joint name="ee_link_root_joint" type="fixed">
+    <!-- wrist3 -> ft_frame -> assembly joint0 -> inverse(joint1) -> 85 base: Rz(+pi/2), translation 0; static USD verified. -->
+    <origin xyz="0 0 0" rpy="0 0 1.570796326794897" />
+    <parent link="wrist_3_link" />
+    <child link="ee_link_robotiq_arg2f_base_link" />
+  </joint>
+  <link name="ee_link_robotiq_arg2f_base_link" />
+  <link name="forearm_link" />
+  <link name="shoulder_link" />
+  <link name="upper_arm_link" />
+  <link name="ur" />
+  <link name="world" />
+  <link name="wrist_1_link" />
+  <link name="wrist_2_link" />
+  <link name="wrist_3_link" />
+</robot>

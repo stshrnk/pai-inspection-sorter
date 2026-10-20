@@ -1,0 +1,164 @@
+{
+  "verification": "static USD metadata and zero-pose FK only; no simulation",
+  "sources": {
+    "arm_base": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/UniversalRobots/ur10e/payloads/base.usda",
+      "bytes": 16665,
+      "sha256": "df0b9e1b4b2edea363b5dcabc43553ef154ed9b38229da82e6caa66c895a0d8f"
+    },
+    "arm_physics": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/UniversalRobots/ur10e/payloads/Physics/physics.usda",
+      "bytes": 12045,
+      "sha256": "a7214e1022f75d992ecab02b482fd4d4108555d0cb1c79b2148d5a702a210a09"
+    },
+    "assembly": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/UniversalRobots/ur10e/payloads/Gripper/Robotiq_2F_85.usda",
+      "bytes": 11316,
+      "sha256": "93307e7ef0a9fffd52cf8358e8179ffc869dd2075f66290fd199c0b0b96ccefc"
+    },
+    "hand_base": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Robotiq/2F-85/payloads/base.usda",
+      "bytes": 18073,
+      "sha256": "de64b6a70ddcec338db03b7d08aaa8eae9704ffff00d08068b03cabd233a3164"
+    },
+    "hand_robot": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Robotiq/2F-85/payloads/robot.usda",
+      "bytes": 3315,
+      "sha256": "91ec4acc9f040120e52d50bb91c503d3a5e4e7407ed7d834a91a35b590607ed2"
+    },
+    "hand_physics": {
+      "url": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Robotiq/2F-85/payloads/Physics/Physics.usda",
+      "bytes": 11354,
+      "sha256": "ab91b97a73bf3468e5a60f9bca77e825ca0707e5809cb5d742eb34d6239050a0"
+    }
+  },
+  "arm_joint_errors": {
+    "shoulder_pan_joint": {
+      "local_position_max_abs_m": 4.100799561035373e-09,
+      "local_rotation_matrix_max_abs": 6.616701687701229e-08,
+      "q0_world_position_max_abs_m": 4.100799561035373e-09,
+      "q0_world_rotation_matrix_max_abs": 6.616701687701229e-08
+    },
+    "shoulder_lift_joint": {
+      "local_position_max_abs_m": 0.0,
+      "local_rotation_matrix_max_abs": 7.320510369540262e-08,
+      "q0_world_position_max_abs_m": 4.100799561035373e-09,
+      "q0_world_rotation_matrix_max_abs": 7.320510369540176e-08
+    },
+    "elbow_joint": {
+      "local_position_max_abs_m": 1.4495849631757096e-08,
+      "local_rotation_matrix_max_abs": 0.0,
+      "q0_world_position_max_abs_m": 4.054053626692465e-08,
+      "q0_world_rotation_matrix_max_abs": 7.320510369540176e-08
+    },
+    "wrist_1_joint": {
+      "local_position_max_abs_m": 1.163482665766935e-08,
+      "local_rotation_matrix_max_abs": 0.0,
+      "q0_world_position_max_abs_m": 7.259763371014749e-08,
+      "q0_world_rotation_matrix_max_abs": 7.320510369540176e-08
+    },
+    "wrist_2_joint": {
+      "local_position_max_abs_m": 2.2292137163981707e-09,
+      "local_rotation_matrix_max_abs": 7.320510369540262e-08,
+      "q0_world_position_max_abs_m": 6.382400205562355e-08,
+      "q0_world_rotation_matrix_max_abs": 1.4641020694671563e-07
+    },
+    "wrist_3_joint": {
+      "local_position_max_abs_m": 1.4781951912512525e-09,
+      "local_rotation_matrix_max_abs": 7.320509992064396e-08,
+      "q0_world_position_max_abs_m": 9.51045170394238e-08,
+      "q0_world_rotation_matrix_max_abs": 7.320510325131305e-08
+    }
+  },
+  "max_arm_error": 1.4641020694671563e-07,
+  "mount_from_fixed_joint": [
+    [
+      -1.1409601707867963e-07,
+      -0.9999999999999934,
+      7.742533764297276e-15,
+      -2.220445795906242e-16
+    ],
+    [
+      0.9999999999999848,
+      -1.1409601730072462e-07,
+      -1.3315805313179866e-07,
+      -2.7755578718864315e-16
+    ],
+    [
+      1.331580531317987e-07,
+      -7.450269767294879e-15,
+      0.9999999999999911,
+      -1.6653348811374187e-16
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mount_from_authored_pose": [
+    [
+      -4.37113870602002e-08,
+      -0.9999999999999987,
+      3.805807414558053e-15,
+      0.0
+    ],
+    [
+      0.9999999999999855,
+      -4.3711387060200234e-08,
+      -1.629206793305986e-07,
+      0.0
+    ],
+    [
+      1.6292067977468694e-07,
+      -3.315681459772558e-15,
+      0.9999999999999865,
+      -5.551115123125783e-17
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mount_urdf": [
+    [
+      -3.8285686989269494e-16,
+      -1.0,
+      0.0,
+      0.0
+    ],
+    [
+      1.0,
+      -3.8285686989269494e-16,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mount_fixed_max_abs_error": 1.331580531317987e-07,
+  "mount_pose_max_abs_error": 1.6292067977468694e-07,
+  "finger_limits_degrees": [
+    0.0,
+    47.0
+  ],
+  "tolerance": 1e-06,
+  "passed": true,
+  "limits": [
+    "Finger contact dynamics and grasp success require a separate Isaac Sim run.",
+    "Profile contains no collision-avoidance geometry."
+  ]
+}

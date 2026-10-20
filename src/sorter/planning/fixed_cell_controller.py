@@ -24,6 +24,7 @@ class _FixedCellIK(IKLerpController):
     """
 
     def __init__(self, robot, physics_dt: float, max_joint_speed: float):
+        self.RMPFLOW_DIR=getattr(robot,"sorter_kinematics_dir",self.RMPFLOW_DIR)
         super().__init__("fixed_cell_ik", robot, physics_dt, interpolation_speed=0.1)
         self._physics_dt = physics_dt
         self.max_joint_speed = max_joint_speed
@@ -83,6 +84,10 @@ class FixedCellController:
     PHASES = (
         "approach", "descend", "close", "lift", "transport", "lower", "open", "retreat"
     )
+    CARTESIAN_SPEEDS = {
+        "approach": 0.15, "descend": 0.04, "lift": 0.08,
+        "transport": 0.12, "lower": 0.04, "retreat": 0.08,
+    }
 
     def __init__(
         self,
@@ -94,6 +99,8 @@ class FixedCellController:
         clearance: float = 0.24,
         max_joint_speed: float = 0.9,
         phase_timeout: float = 15.0,
+        gripper_speed: float = 0.4,
+        cartesian_speeds: dict[str, float] | None = None,
     ):
         self.robot = robot
         self.physics_dt = float(physics_dt)
@@ -108,16 +115,27 @@ class FixedCellController:
         self.ee_offset = float(os.environ.get("EE_OFFSET", ee_offset))
         self.clearance = float(clearance)
         self.phase_timeout = float(phase_timeout)
+        # Both configured Robotiq profiles close along local Y. A downward
+        # pose at yaw zero therefore grips the part's short world-Y side.
         self.orientation = euler_angles_to_quat(np.array([0.0, np.pi, 0.0]))
         self._ik = _FixedCellIK(robot, self.physics_dt, float(max_joint_speed))
         self._arm_indices = np.array(self._ik._joints_subset.joint_indices, dtype=int)
         self._finger_indices = np.array(robot.gripper.active_joint_indices, dtype=int)
+        self.gripper_speed = float(gripper_speed)
+        self._finger_commanded_positions = np.asarray(robot.get_joint_positions(),dtype=float)[self._finger_indices].copy()
         self._index = 0
         self._phase_elapsed = 0.0
         self._stable_elapsed = 0.0
         self._ik_failed_elapsed = 0.0
         self._elapsed = 0.0
         self._pose_logged = False
+        self.cartesian_speeds = dict(self.CARTESIAN_SPEEDS)
+        if cartesian_speeds:
+            self.cartesian_speeds.update(cartesian_speeds)
+        if any(not np.isfinite(v) or v <= 0 for v in self.cartesian_speeds.values()):
+            raise ValueError("Cartesian speeds must be finite and positive")
+        self._path_start = None
+        self._path_duration = 0.0
         self._hold_positions = np.array(robot.get_joint_positions(), dtype=float, copy=True)
         self._failed = False
         self._released = False
@@ -136,7 +154,7 @@ class FixedCellController:
         )
         # Gripper holds allow real contact dynamics to settle. Motion holds
         # additionally require measured end-effector convergence.
-        self._minimum_times = (1.0, 0.8, 1.0, 0.8, 1.0, 0.8, 0.8, 0.8)
+        self._minimum_times = (1.0, 0.8, 2.0, 0.8, 1.0, 0.8, 0.8, 0.8)
 
     @property
     def phase(self) -> str:
@@ -175,9 +193,36 @@ class FixedCellController:
     def _hold_action(self) -> ArticulationAction:
         return ArticulationAction(joint_positions=self._hold_positions.copy())
 
+    def _cartesian_waypoint(self, phase: str, final_target: np.ndarray) -> np.ndarray:
+        """Advance on a straight line from the phase's measured initial pose.
+
+        The path clock uses physics time and does not track the workpiece.
+        Joint interpolation toward a distant endpoint can sweep the open
+        fingers sideways through a part; per-tick Cartesian IK avoids that.
+        """
+        if self._path_start is None:
+            position,_=self.robot.end_effector.get_world_pose()
+            self._path_start=np.array(position,dtype=float,copy=True)
+            distance=float(np.linalg.norm(final_target-self._path_start))
+            self._path_duration=distance/self.cartesian_speeds[phase]
+            print(
+                f"[cell-path] phase={phase} start={np.round(self._path_start,5).tolist()} "
+                f"end={np.round(final_target,5).tolist()} "
+                f"speed={self.cartesian_speeds[phase]:.3f}m/s "
+                f"duration={self._path_duration:.3f}s",flush=True,
+            )
+        fraction=1.0 if self._path_duration<=0 else min(self._phase_elapsed/self._path_duration,1.0)
+        return self._path_start+fraction*(final_target-self._path_start)
+
     def _with_gripper(self, arm_action, command: str) -> ArticulationAction:
         finger_action = self.robot.gripper.forward(action=command)
         positions = list(finger_action.joint_positions)
+        for i,index in enumerate(self._finger_indices):
+            requested=float(positions[index])
+            difference=requested-self._finger_commanded_positions[i]
+            self._finger_commanded_positions[i]+=np.clip(
+                difference,-self.gripper_speed*self.physics_dt,self.gripper_speed*self.physics_dt)
+            positions[index]=float(self._finger_commanded_positions[i])
         if arm_action.joint_positions is not None:
             indices = arm_action.joint_indices
             if indices is None:
@@ -205,6 +250,15 @@ class FixedCellController:
                 f"target_quat={np.round(self.orientation,5).tolist()}",
                 flush=True,
             )
+            finger_q=np.asarray(self.robot.get_joint_positions(),dtype=float)[self._finger_indices]
+            finger_v=np.asarray(self.robot.get_joint_velocities(),dtype=float)[self._finger_indices]
+            print(
+                f"[cell-fingers] phase={self.phase} position={np.round(finger_q,5).tolist()} "
+                f"velocity={np.round(finger_v,5).tolist()} "
+                f"command={np.round(self._finger_commanded_positions,5).tolist()} "
+                f"slew_limit={self.gripper_speed:.3f}rad/s",
+                flush=True,
+            )
             current=np.asarray(self._ik._joints_subset.get_joint_positions(),dtype=float)
             target_q=self._ik._target_cspace_positions
             command_q=self._ik._commanded_cspace_positions
@@ -229,6 +283,8 @@ class FixedCellController:
             "simulation_seconds": self._phase_elapsed,
             "position_error_m": self.last_position_error,
             "orientation_error_rad": self.last_orientation_error,
+            "cartesian_speed_m_s": self.cartesian_speeds.get(name),
+            "path_duration_s": self._path_duration,
         })
         print(
             f"[cell] {name} complete t={self._phase_elapsed:.2f}s "
@@ -240,6 +296,8 @@ class FixedCellController:
         self._index += 1
         self._phase_elapsed = self._stable_elapsed = self._ik_failed_elapsed = 0.0
         self._pose_logged = False
+        self._path_start = None
+        self._path_duration = 0.0
 
     def step(self) -> ArticulationAction:
         if self.failed or self.done:
@@ -275,11 +333,15 @@ class FixedCellController:
                 return self._hold_action()
             finger_speed = np.asarray(self.robot.get_joint_velocities(), dtype=float)[self._finger_indices]
             settled = bool(np.max(np.abs(finger_speed)) < 0.15)
+            desired=(self.robot.gripper.joint_closed_positions if phase=='close'
+                     else self.robot.gripper.joint_opened_positions)
+            settled=settled and bool(np.max(np.abs(self._finger_commanded_positions-desired))<0.005)
             if phase == "open":
                 finger_position = np.asarray(self.robot.get_joint_positions(), dtype=float)[self._finger_indices]
                 settled = settled and bool(np.max(np.abs(finger_position)) < 0.08)
         else:
-            arm = self._ik.forward(target, self.orientation)
+            waypoint=self._cartesian_waypoint(phase,target)
+            arm = self._ik.forward(waypoint, self.orientation)
             if self._ik.tracking_limited_elapsed > 0.5:
                 self.abort(f"joint tracking stalled in {phase}: error={self._ik.tracking_error:.3f}rad")
                 return self._hold_action()
@@ -291,9 +353,11 @@ class FixedCellController:
             else:
                 self._ik_failed_elapsed = 0.0
             tolerance = 0.006 if phase in ("descend", "lower") else 0.012
-            settled = self.last_position_error < tolerance and self.last_orientation_error < 0.10
+            path_complete=self._phase_elapsed>=self._path_duration
+            settled = path_complete and self.last_position_error < tolerance and self.last_orientation_error < 0.10
         result = self._with_gripper(arm, command)
         self._stable_elapsed = self._stable_elapsed + self.physics_dt if settled else 0.0
-        if self._phase_elapsed >= self._minimum_times[self._index] and self._stable_elapsed >= 0.12:
+        minimum_time=max(self._minimum_times[self._index],self._path_duration)
+        if self._phase_elapsed >= minimum_time and self._stable_elapsed >= 0.12:
             self._advance()
         return result

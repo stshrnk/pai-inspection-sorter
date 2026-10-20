@@ -27,7 +27,8 @@ p.add_argument('--record-dir', help='Save camera-only frames, no desktop or term
 p.add_argument('--record-every', type=int, default=10, help='Physics steps per frame (dt=0.005)')
 p.add_argument('--continue-after-failure', action='store_true', help='Evaluation only: reset each failed trial; default stops')
 p.add_argument('--phase-timeout', type=float, default=15.)
-p.add_argument('--ee-offset', type=float, default=.20)
+p.add_argument('--robot-profile', choices=['robotiq85','legacy140'], default='robotiq85')
+p.add_argument('--ee-offset', type=float, default=.13)
 p.add_argument('--joint-speed', type=float, default=.9)
 a = p.parse_args()
 if a.trials < 1 or a.record_every < 1:
@@ -65,6 +66,7 @@ def main():
         'run_id': run_id,
         'config': {
             'controller': 'fixed-cell IK feedback', 'motion_only': a.motion_only,
+            'robot_profile': a.robot_profile,
             'physics_dt': 1 / 200, 'ee_offset': a.ee_offset,
             'joint_speed': a.joint_speed, 'sequence': sequence, 'trials_requested': a.trials,
             'stop_on_failure': not a.continue_after_failure,
@@ -123,16 +125,17 @@ def main():
         from isaacsim.core.utils.viewports import set_camera_view
         from src.sorter.cell_scene import (
             create_scene, initialize_camera, set_appearance, capture_rgb,
-            SOURCE, PART_SIZE, TRAYS, FLOOR_Z, TRAY_WIDTH,
+            SOURCE, PART_SIZE, PART_MASS, TRAYS, FLOOR_Z, TRAY_WIDTH,
         )
         from src.sorter.measurement import TrayBounds, PlacementMonitor
         from src.sorter.planning.fixed_cell_controller import FixedCellController
 
+        payload['config']['part_mass_kg']=PART_MASS
         stage = 'world_creation'
         print('[startup] World begin')
         world = World(stage_units_in_meters=1., physics_dt=1 / 200, rendering_dt=1 / 20)
         stage = 'scene_creation'
-        scene = create_scene(world)
+        scene = create_scene(world, robot_profile=a.robot_profile)
         stage = 'world_reset'
         print('[startup] reset begin')
         world.reset()
@@ -153,7 +156,7 @@ def main():
             overview.initialize()
             overview.set_frequency(-1)
             overview.set_clipping_range(.01, 20.)
-            overview.set_focal_length(.022)
+            overview.set_focal_length(.040)
             overview.set_horizontal_aperture(.036)
             set_camera_view(eye=np.array([1.35, 1.65, 1.45]), target=np.array([0., .38, .22]), camera_prim_path='/World/overview')
         set_camera_view(eye=np.array([1.35, 1.65, 1.45]), target=np.array([0., .38, .22]))
