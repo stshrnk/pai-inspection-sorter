@@ -21,9 +21,11 @@ p.add_argument('--headless', action='store_true')
 p.add_argument('--trials', type=int, default=2)
 p.add_argument('--model', default='models/inspection/classifier.pt')
 p.add_argument('--sequence', default='good,defect', help='Appearance sequence; truth is used only by evaluation')
+p.add_argument('--conditions', type=Path, help='Appearance plan JSON; no destinations are supplied to the classifier')
 p.add_argument('--motion-only', choices=['good', 'defect', 'review'], help='Fixed destination for mechanical tests; bypasses AI')
 p.add_argument('--output-dir', default='artifacts/run')
 p.add_argument('--record-dir', help='Save camera-only frames, no desktop or terminal')
+p.add_argument('--record-trials',type=int,help='Record only this many initial trials')
 p.add_argument('--record-every', type=int, default=10, help='Physics steps per frame (dt=0.005)')
 p.add_argument('--render-every', type=int, default=20, help='Physics steps per non-recording render')
 p.add_argument('--continue-after-failure', action='store_true', help='Evaluation only: reset each failed trial; default stops')
@@ -33,12 +35,32 @@ p.add_argument('--ee-offset', type=float, default=.13)
 p.add_argument('--joint-speed', type=float, default=.9)
 a = p.parse_args()
 if a.trials < 1 or a.record_every < 1 or a.render_every < 1:
-    p.error('trials and record-every must be positive')
+    p.error('trials and render/record intervals must be positive')
+if a.record_trials is not None and a.record_trials<1:
+    p.error('record-trials must be positive')
 if not all(math.isfinite(value) and value > 0 for value in (a.phase_timeout, a.ee_offset, a.joint_speed)):
     p.error('phase-timeout, ee-offset and joint-speed must be finite and positive')
 sequence = a.sequence.split(',')
 if any(value not in ('good', 'defect') for value in sequence):
     p.error('sequence must contain good/defect')
+appearance_plan=None
+if a.conditions:
+    try:
+        appearance_plan=json.loads(a.conditions.read_text())
+        if not isinstance(appearance_plan,list) or not appearance_plan:
+            raise ValueError('empty conditions')
+        allowed={'gray','dome','key','patch_x','patch_y','patch_w','patch_h','patch_gray'}
+        for row in appearance_plan:
+            if row.get('truth') not in ('good','defect') or not isinstance(row.get('condition'),dict):
+                raise ValueError('invalid condition row')
+            for key,value in row['condition'].items():
+                if key not in allowed or not isinstance(value,(int,float)) or not math.isfinite(value):
+                    raise ValueError('invalid condition field')
+            if any(row['condition'].get(key,1)<=0 for key in ('gray','dome','key','patch_w','patch_h','patch_gray')):
+                raise ValueError('nonpositive condition')
+    except (OSError,ValueError,TypeError,AttributeError):
+        p.error('conditions must be a nonempty JSON list of truth and numeric appearance conditions')
+
 
 
 def _safe_error(stage, error):
@@ -73,9 +95,10 @@ def main():
             'stop_on_failure': not a.continue_after_failure,
             'renderer': 'RaytracedLighting', 'anti_aliasing': 0,
             'record_every': a.record_every, 'record_fps': 200 / a.record_every,
-            'render_every':a.render_every,
+            'render_every':a.render_every,'record_trials':a.record_trials,
         },
         'cycles': cycles,
+        'appearance_plan':appearance_plan,
     }
 
     def persist(status='running', stop_reason=None):
@@ -171,6 +194,7 @@ def main():
             from src.sorter.vision import SorterClassifier
             classifier = SorterClassifier(a.model)
         frame_index, tick = 0, 0
+        recording_enabled=True
 
         def step():
             nonlocal tick, frame_index
@@ -183,9 +207,9 @@ def main():
             if world.current_time_step_index != before + 1:
                 raise RuntimeError('physics step did not advance exactly once')
             tick += 1
-            if tick % a.render_every == 0 or (overview is not None and tick % a.record_every == 0):
+            if tick % a.render_every == 0 or (overview is not None and recording_enabled and tick % a.record_every == 0):
                 world.render()
-            if overview is not None and tick % a.record_every == 0:
+            if overview is not None and recording_enabled and tick % a.record_every == 0:
                 rgb = np.asarray(overview.get_rgb())
                 if rgb.ndim == 3 and rgb.shape[2] >= 3 and np.isfinite(rgb).all():
                     Image.fromarray(rgb[:, :, :3].astype(np.uint8)).save(Path(a.record_dir) / f'frame_{frame_index:06d}.png')
@@ -193,9 +217,10 @@ def main():
 
         persist()
         for trial in range(a.trials):
+            recording_enabled=a.record_trials is None or trial<a.record_trials
             start = time.monotonic()
             simulation_start = world.current_time
-            truth = sequence[trial % len(sequence)]
+            truth = (appearance_plan[trial % len(appearance_plan)]['truth'] if appearance_plan else sequence[trial % len(sequence)])
             control = None
             fatal_trial_error = False
             record = {
@@ -220,6 +245,9 @@ def main():
                 part.set_angular_velocity(np.zeros(3))
                 condition = {'gray': .65, 'dome': 65., 'key': 180., 'patch_x': 0., 'patch_y': 0.,
                              'patch_w': .032, 'patch_h': .021, 'patch_gray': .06}
+                if appearance_plan:
+                    condition.update(appearance_plan[trial % len(appearance_plan)]['condition'])
+                record['condition']=condition.copy()
                 set_appearance(scene, condition, truth == 'defect')
                 for _ in range(80):
                     step()

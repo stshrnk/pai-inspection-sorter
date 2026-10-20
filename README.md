@@ -20,6 +20,7 @@ scripts/evaluate_classifier.py  固定済みモデルを独立 test で評価
 scripts/baseline.py             流用元の搬送ベースライン
 scripts/summarize_runs.py       搬送 metrics JSON / 検査 JSONL の集計
 scripts/make_video.py           カメラ PNG 連番から MP4 を作成
+config/demo_conditions.json     valから選んだ3経路確認用の外観条件
 src/sorter/cell_scene.py        部品・模擬汚れ・照明・カメラ・3トレイ
 src/sorter/robot_profiles.py    組立済みnative 2F-85 variantを参照
 src/sorter/vision/              前処理・CNN・画像だけの推論・評価
@@ -94,6 +95,16 @@ CNN は 64×64 RGB を入力とする3層の小型畳み込みモデルで、学
 
 `--sequence` はシミュレータで生成する部品の順番であり、分類器には渡さない。`good` が良品、`defect` が模擬汚れあり。行先は撮影画像への推論結果で選択する。要確認の発生は val で固定した信頼度範囲による。
 
+標準の `--sequence good,defect` でも、valで決めた相対的な信頼度境界に入れば `review` になる。これは要確認への振り分けとして正常な動作。3経路の接続を確認する場合は、次の外観条件ファイルを使用する。
+
+```bash
+./run.sh --headless --trials 3 \
+  --model models/inspection/classifier.pt \
+  --conditions config/demo_conditions.json --output-dir artifacts/demo_three_routes
+```
+
+`--conditions` は `--sequence` に代わって、ファイル内の外観条件を順番に繰り返す。`demo_conditions.json` の3条件は、valから良品・不良品・要確認の経路確認用に選んだ候補。画像を再撮影してから分類器が行先を決めるため、ファイル内に行先の指定はなく、描画の変動で判定が変わる場合もある。この条件の試行は、固定条件での物理搬送とAI接続の検証に使い、分類精度のbenchmark集計には含めない。
+
 標準は `--robot-profile robotiq85 --ee-offset 0.13`。85の開いたpadはbaseからZ方向に約0.110〜0.148 m、中央0.1294 mにあるため、オフセット0.13 mで部品中心付近を挟む。base姿勢は下向き・yaw=0で、指はworld Y方向から短辺0.0515 mを挟む。これらは静的形状から決めた初期設定であり、把持成功率は実測で確認する。
 
 制御は200 Hzで1物理ステップずつ進め、描画を分離する。手先はCartesian空間の直線経路に沿ってIKを更新し、関節指令に0.9 rad/sの上限を設ける。主な標準設定は次のとおり。
@@ -121,15 +132,19 @@ CNN は 64×64 RGB を入力とする3層の小型畳み込みモデルで、学
   --output-dir artifacts/motion_review
 ```
 
-このモードの結果は AI による仕分け成功率と分けて集計する。機構が安定した後、`--trials 20` などで通し動作を測定する。失敗時停止のため、指定試行数より少ない件数で終わる場合がある。
+このモードの結果は AI による仕分け成功率と分けて集計する。機構のみの良品行きは、独立3試行で3/3成功を確認した。実行設定・制約と他の試行結果は [docs/RESULTS.md](docs/RESULTS.md) を参照。
+
+ここで1試行は、毎回ロボットの初期関節状態と部品の供給位置・姿勢へリセットして開始する独立episode。同じ部品を戻して繰り返し、連続供給装置やトレイへの20部品の蓄積は対象外とする。失敗時停止では、指定試行数より少ない件数で終わる場合がある。
 
 失敗例も含めて指定件数を測る評価専用モードでは、明示的に `--continue-after-failure` を付ける。試行間で供給位置とロボット姿勢をリセットする。通常のデモ実行は失敗時停止を使う。
 
 ```bash
 ./run.sh --headless --trials 20 --continue-after-failure \
-  --model models/inspection/classifier.pt --sequence good,defect \
+  --model models/inspection/classifier.pt --conditions config/demo_conditions.json \
   --output-dir artifacts/evaluation20
 ```
+
+この20試行は3つのデモ条件を繰り返した、物理搬送と判定接続の評価。分類accuracyは、別途 `evaluate_classifier.py` による独立testの値を報告する。
 
 成功判定は、**部品の全体が指定トレイ内に入り、床の近くにあり、グリッパー開放後に連続して静止すること**。回転した部品の全体 AABB を使い、中心位置だけでは成功にしない。標準の静止しきい値は並進速度0.015 m/s未満・角速度0.15 rad/s未満を連続60 physics steps。200 Hz の場合は0.30秒に相当する。各試行の実際の設定と判定理由は保存された metrics を優先する。
 
@@ -148,11 +163,11 @@ python3 scripts/summarize_runs.py 'artifacts/motion_*/metrics.json' \
 
 ## フレーム保存と試し動画
 
-ターミナルやデスクトップ全体を撮らず、シミュレーションのカメラ画像を連番保存する。
+ターミナルやデスクトップ全体を撮らず、シミュレーションのカメラ視点だけを連番保存する。検査画像を待つ間も共通のphysics/render callbackを通し、録画に含める。
 
 ```bash
-./run.sh --headless --trials 2 \
-  --model models/inspection/classifier.pt --sequence good,defect \
+./run.sh --headless --trials 3 \
+  --model models/inspection/classifier.pt --conditions config/demo_conditions.json \
   --output-dir artifacts/recording_demo --record-dir recordings/demo/frames
 
 python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 20
