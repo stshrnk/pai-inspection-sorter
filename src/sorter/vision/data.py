@@ -57,7 +57,7 @@ def load_manifest(path, *, check_files: bool = True) -> dict:
     rows = document.get("samples")
     if not isinstance(rows, list) or not rows:
         raise ValueError("Manifest requires a nonempty samples list")
-    groups, images = {}, set()
+    groups, images, conditions = {}, set(), {}
     root = path.parent.resolve()
     for row in rows:
         if row.get("label") not in LABELS or row.get("split") not in SPLITS:
@@ -68,6 +68,13 @@ def load_manifest(path, *, check_files: bool = True) -> dict:
         previous = groups.setdefault(group, row["split"])
         if previous != row["split"]:
             raise ValueError(f"Condition group appears in multiple splits: {group}")
+        if "condition" in row:
+            if not isinstance(row["condition"], dict):
+                raise ValueError("Optional condition must be a dictionary")
+            signature = json.dumps(row["condition"], sort_keys=True, separators=(",", ":"))
+            previous_condition_split = conditions.setdefault(signature, row["split"])
+            if previous_condition_split != row["split"]:
+                raise ValueError("Identical generation condition appears in multiple splits")
         relative = row.get("image")
         if not isinstance(relative, str) or Path(relative).is_absolute():
             raise ValueError("Image paths must be relative to the manifest")

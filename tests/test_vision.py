@@ -23,7 +23,7 @@ class VisionTests(unittest.TestCase):
         ]}
 
     def load(self, document):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as directory:
             path = Path(directory) / "manifest.json"
             path.write_text(json.dumps(document), encoding="utf-8")
             return load_manifest(path, check_files=False)
@@ -38,6 +38,13 @@ class VisionTests(unittest.TestCase):
         document = self.manifest()
         document["samples"][-1]["image"] = document["samples"][0]["image"]
         with self.assertRaisesRegex(ValueError, "Duplicate image"):
+            self.load(document)
+
+    def test_identical_condition_with_different_group_names_rejected(self):
+        document = self.manifest()
+        document["samples"][0]["condition"] = {"light": 300}
+        document["samples"][-1]["condition"] = {"light": 300}
+        with self.assertRaisesRegex(ValueError, "Identical generation condition"):
             self.load(document)
 
     def test_path_escape_rejected(self):
@@ -72,7 +79,7 @@ class VisionTests(unittest.TestCase):
     def test_inference_uses_pixels_only(self):
         config = fit_brightness([0.8, 0.9, 0.1, 0.2], [0, 0, 1, 1])
         config["review_policy"] = {"threshold": 0.7}
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as directory:
             path = Path(directory) / "brightness.json"
             path.write_text(json.dumps(config), encoding="utf-8")
             classifier = SorterClassifier(path, method="brightness")
