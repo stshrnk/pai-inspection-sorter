@@ -194,3 +194,32 @@ python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 2
 85用armの局所変換・ゼロ姿勢FKとUSDとの最大成分誤差は1.47e-7、マウントは1.63e-7以下で、許容1e-6以内。`static_evidence.json` に参照URL・SHA256・比較値を保存した。実行時にも、USDの手先実姿勢とLula FKがログの表示精度で一致したことを確認している。この整合性確認は、物理搬送の成功確認とは分けて扱う。
 
 表示・接触計算用の標準ロボットは NVIDIA Isaac Sim 6.0 の `Isaac/Robots_Multiphysics/UniversalRobots/ur10e/ur10e.usda` を実行時に参照し、`Physics=physx` / `Gripper=Robotiq_2F_85` を選択する。比較用140だけは `Isaac/Samples/Rigging/Manipulator/configure_manipulator/ur10e/ur/ur_gripper.usd` を参照する。USD 本体・メッシュ・テクスチャ・Isaac Sim 本体はリポジトリへ同梱しない。旧URDFに記載されたメッシュ名も元アセット由来の参照であり、同名メッシュのコピーは含めない。アセット利用条件は NVIDIA の配布条件に従う。
+
+## 動作動画・匿名レポート
+
+ローカルの `recordings/demo.mp4` は3経路のAI判定字幕を付けたデモ。動画だけ表示gammaを1.6に補正し、分類入力と元のPNG連番は変更しない。試行ごとの初期化を含む検証映像であり、連続供給機の映像ではない。
+
+![3経路デモの一場面](review/demo_frame.png)
+
+最初の3試行だけ録画し、残りを同じ条件で測定する例:
+
+```bash
+./run.sh --headless --conditions config/demo_conditions.json --trials 20 \
+  --continue-after-failure --output-dir artifacts/evaluation20 \
+  --record-dir recordings/demo/frames --record-trials 3
+python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 \
+  --fps 20 --metrics artifacts/evaluation20/metrics.json --trials 3 --gamma 1.6
+python3 scripts/build_report.py
+```
+
+レポートは `artifacts/report/inspection_report.html` と `.pdf` に出力する。PDF生成にはWeasyPrintが必要（検証環境の既存版68.1を使用）。`--html-only` なら標準PythonだけでHTMLを作れる。匿名の下書きであり、提出前に内容とファイル名を確認する。GitHub・YouTubeの公開やOmniCampus提出は自動実行しない。
+
+実セルでの判定だけを確認する場合:
+
+```bash
+SORTER_ENTRYPOINT=scripts/preview_inspection.py ./run.sh --headless \
+  --conditions config/demo_conditions.json --model models/inspection/classifier.pt \
+  --out-dir artifacts/preview/new-run
+```
+
+この確認は搬送を実行せず、分類benchmarkの件数にも加えない。`SORTER_DEBUG=1` で実行時の例外詳細を端末ログへ出せる。録画対象はカメラ画像だけとする。
