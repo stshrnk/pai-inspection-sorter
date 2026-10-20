@@ -1,0 +1,582 @@
+{
+  "schema_version": 1,
+  "measured_date": "2026-10-20",
+  "environment": {
+    "simulator": "Isaac Sim 6.0.0-rc.22",
+    "architecture": "aarch64",
+    "hardware": "NVIDIA DGX Spark / GB10",
+    "training_device": "cpu",
+    "cpu_threads": 2
+  },
+  "dataset": {
+    "name": "inspection-v1",
+    "split_summary": {
+      "train": {
+        "images": 180,
+        "groups": 90,
+        "classes": {
+          "good": 90,
+          "defect": 90
+        }
+      },
+      "val": {
+        "images": 60,
+        "groups": 30,
+        "classes": {
+          "good": 30,
+          "defect": 30
+        }
+      },
+      "test": {
+        "images": 60,
+        "groups": 30,
+        "classes": {
+          "good": 30,
+          "defect": 30
+        }
+      }
+    },
+    "condition_groups_disjoint": true,
+    "generator_seed": 42,
+    "manifest_sha256": "7df77c6a5f2c95918e2f7647b782ca4e394b4c1a8e24320bdaa717e0b22301e8",
+    "nominal_light_ranges": {
+      "dome": [
+        25,
+        110
+      ],
+      "key": [
+        40,
+        260
+      ]
+    },
+    "dark_test_light_ranges": {
+      "dome": [
+        12,
+        18
+      ],
+      "key": [
+        15,
+        35
+      ]
+    },
+    "image_bytes_sha256": "38dfa28368ebad75af4c6d4386dbe2b8a7b9a5cd5a088718c01422261e4b94a4"
+  },
+  "training": {
+    "architecture": "TinyInspectionCNN",
+    "trainable_parameters": 17225,
+    "seed": 42,
+    "best_epoch": 93,
+    "epochs_run": 100,
+    "elapsed_seconds": 13.014693898963742,
+    "temperature": 1.0,
+    "temperature_policy": "Validation NLL fit on T in [1, 10]; sharpening disabled to preserve review resolution.",
+    "checkpoint_sha256": "55b1afdb12c2aabbb44d553ff30b16e8158f48775544914b1761fc60ce9f4a58"
+  },
+  "review_policy": {
+    "threshold": 0.9996913274226139,
+    "defect_score_review_interval": [
+      0.0003086725773860932,
+      0.9996913274226139
+    ],
+    "minimum_review_fraction": 0.1,
+    "review_fraction_tie_policy": "Confidence equal to the boundary is accepted; tied scores can reduce the requested fraction.",
+    "maximum_validation_accepted_error": 0.05,
+    "validation_coverage": 0.9,
+    "validation_accepted_error": 0.0,
+    "note": "Empirical validation calibration; confidence is not a guaranteed probability."
+  },
+  "brightness": {
+    "threshold": 0.1697545126080513,
+    "polarity": -1.0,
+    "score_scale": 0.039613992528384386,
+    "feature": "10th percentile luminance in fixed central width-60-percent height-30-percent ROI",
+    "training_error": 0.17222222222222222,
+    "review_policy": {
+      "threshold": 1.0000000000000002,
+      "defect_score_review_interval": [
+        0.0,
+        1.0
+      ],
+      "minimum_review_fraction": 0.1,
+      "review_fraction_tie_policy": "Confidence equal to the boundary is accepted; tied scores can reduce the requested fraction.",
+      "maximum_validation_accepted_error": 0.05,
+      "validation_coverage": 0.0,
+      "validation_accepted_error": null,
+      "note": "Empirical validation calibration; confidence is not a guaranteed probability."
+    }
+  },
+  "validation": {
+    "cnn": {
+      "samples": 60,
+      "accuracy": 1.0,
+      "defect_precision": 1.0,
+      "defect_recall": 1.0,
+      "confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect"
+        ],
+        "matrix": [
+          [
+            30,
+            0
+          ],
+          [
+            0,
+            30
+          ]
+        ]
+      },
+      "routing_confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect",
+          "review"
+        ],
+        "matrix": [
+          [
+            25,
+            0,
+            5
+          ],
+          [
+            0,
+            29,
+            1
+          ]
+        ]
+      },
+      "review_count": 6,
+      "coverage": 0.9,
+      "accepted_error": 0.0,
+      "review_threshold": 0.9996913274226139,
+      "brier_score": 2.7747601631820394e-07
+    },
+    "brightness": {
+      "samples": 60,
+      "accuracy": 0.8333333333333334,
+      "defect_precision": 1.0,
+      "defect_recall": 0.6666666666666666,
+      "confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect"
+        ],
+        "matrix": [
+          [
+            30,
+            0
+          ],
+          [
+            10,
+            20
+          ]
+        ]
+      },
+      "routing_confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect",
+          "review"
+        ],
+        "matrix": [
+          [
+            0,
+            0,
+            30
+          ],
+          [
+            0,
+            0,
+            30
+          ]
+        ]
+      },
+      "review_count": 60,
+      "coverage": 0.0,
+      "accepted_error": null,
+      "review_threshold": 1.0000000000000002,
+      "brier_score": 0.14038404324351725
+    }
+  },
+  "test": {
+    "cnn": {
+      "samples": 60,
+      "accuracy": 0.75,
+      "defect_precision": 0.6666666666666666,
+      "defect_recall": 1.0,
+      "confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect"
+        ],
+        "matrix": [
+          [
+            15,
+            15
+          ],
+          [
+            0,
+            30
+          ]
+        ]
+      },
+      "routing_confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect",
+          "review"
+        ],
+        "matrix": [
+          [
+            12,
+            13,
+            5
+          ],
+          [
+            0,
+            29,
+            1
+          ]
+        ]
+      },
+      "review_count": 6,
+      "coverage": 0.9,
+      "accepted_error": 0.24074074074074073,
+      "review_threshold": 0.9996913274226139,
+      "brier_score": 0.24943464856802006,
+      "lighting": {
+        "nominal": {
+          "samples": 30,
+          "accuracy": 1.0,
+          "defect_precision": 1.0,
+          "defect_recall": 1.0,
+          "confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect"
+            ],
+            "matrix": [
+              [
+                15,
+                0
+              ],
+              [
+                0,
+                15
+              ]
+            ]
+          },
+          "routing_confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect",
+              "review"
+            ],
+            "matrix": [
+              [
+                12,
+                0,
+                3
+              ],
+              [
+                0,
+                14,
+                1
+              ]
+            ]
+          },
+          "review_count": 4,
+          "coverage": 0.8666666666666667,
+          "accepted_error": 0.0,
+          "review_threshold": 0.9996913274226139,
+          "brier_score": 2.0350137349160653e-05
+        },
+        "dark": {
+          "samples": 30,
+          "accuracy": 0.5,
+          "defect_precision": 0.5,
+          "defect_recall": 1.0,
+          "confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect"
+            ],
+            "matrix": [
+              [
+                0,
+                15
+              ],
+              [
+                0,
+                15
+              ]
+            ]
+          },
+          "routing_confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect",
+              "review"
+            ],
+            "matrix": [
+              [
+                0,
+                13,
+                2
+              ],
+              [
+                0,
+                15,
+                0
+              ]
+            ]
+          },
+          "review_count": 2,
+          "coverage": 0.9333333333333333,
+          "accepted_error": 0.4642857142857143,
+          "review_threshold": 0.9996913274226139,
+          "brier_score": 0.4988489469986909
+        }
+      }
+    },
+    "brightness": {
+      "samples": 60,
+      "accuracy": 0.6166666666666667,
+      "defect_precision": 0.5945945945945946,
+      "defect_recall": 0.7333333333333333,
+      "confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect"
+        ],
+        "matrix": [
+          [
+            15,
+            15
+          ],
+          [
+            8,
+            22
+          ]
+        ]
+      },
+      "routing_confusion": {
+        "rows": [
+          "good",
+          "defect"
+        ],
+        "columns": [
+          "good",
+          "defect",
+          "review"
+        ],
+        "matrix": [
+          [
+            0,
+            0,
+            30
+          ],
+          [
+            0,
+            0,
+            30
+          ]
+        ]
+      },
+      "review_count": 60,
+      "coverage": 0.0,
+      "accepted_error": null,
+      "review_threshold": 1.0000000000000002,
+      "brier_score": 0.29898632956407195,
+      "lighting": {
+        "nominal": {
+          "samples": 30,
+          "accuracy": 0.7333333333333333,
+          "defect_precision": 1.0,
+          "defect_recall": 0.4666666666666667,
+          "confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect"
+            ],
+            "matrix": [
+              [
+                15,
+                0
+              ],
+              [
+                8,
+                7
+              ]
+            ]
+          },
+          "routing_confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect",
+              "review"
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                15
+              ],
+              [
+                0,
+                0,
+                15
+              ]
+            ]
+          },
+          "review_count": 30,
+          "coverage": 0.0,
+          "accepted_error": null,
+          "review_threshold": 1.0000000000000002,
+          "brier_score": 0.21791945857201364
+        },
+        "dark": {
+          "samples": 30,
+          "accuracy": 0.5,
+          "defect_precision": 0.5,
+          "defect_recall": 1.0,
+          "confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect"
+            ],
+            "matrix": [
+              [
+                0,
+                15
+              ],
+              [
+                0,
+                15
+              ]
+            ]
+          },
+          "routing_confusion": {
+            "rows": [
+              "good",
+              "defect"
+            ],
+            "columns": [
+              "good",
+              "defect",
+              "review"
+            ],
+            "matrix": [
+              [
+                0,
+                0,
+                15
+              ],
+              [
+                0,
+                0,
+                15
+              ]
+            ]
+          },
+          "review_count": 30,
+          "coverage": 0.0,
+          "accepted_error": null,
+          "review_threshold": 1.0000000000000002,
+          "brier_score": 0.3800532005561301
+        }
+      }
+    }
+  },
+  "limits": [
+    "Synthetic fixed-camera images only; real-camera performance is unmeasured.",
+    "CNN misclassifies all 15 dark-lighting good test images as defect; review does not reliably detect this domain shift.",
+    "Brightness review policy rejects every test image; accepted error is undefined, not zero.",
+    "Some good images retain faint rectangular renderer ghosts.",
+    "No model or threshold was tuned after the recorded held-out test evaluation.",
+    "Rendered PNG bitwise reproducibility is not guaranteed; hashes identify the measured snapshot."
+  ],
+  "image_only_api_examples": [
+    {
+      "image": "images/val/condition-107_good.png",
+      "expected": "good",
+      "prediction": {
+        "label": "good",
+        "defect_score": 1.5762225735840985e-05,
+        "confidence": 0.9999842377742642,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "input": "RGB uint8 ndarray"
+    },
+    {
+      "image": "images/val/condition-107_defect.png",
+      "expected": "defect",
+      "prediction": {
+        "label": "defect",
+        "defect_score": 0.9999001722582636,
+        "confidence": 0.9999001722582636,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "input": "RGB uint8 ndarray"
+    }
+  ]
+}
