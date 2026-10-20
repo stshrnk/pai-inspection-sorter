@@ -1,292 +1,367 @@
-"""UR10e Pick and Place with Robotiq 2F-85 Parallel Gripper + Overhead 3D Camera.
+"""Image-only inspection and physically simulated UR10e pick/place cell."""
+from __future__ import annotations
 
-Uses UR10e with a physical parallel gripper (Robotiq 2F-85).
-An overhead depth camera captures RGB, depth, and point cloud data.
-"""
-
+import argparse
+import faulthandler
+import json
+import math
 import os
+from pathlib import Path
 import sys
 import time
-import json
-import argparse
+import uuid
+
+from src.sorter.measurement import InspectionLog, atomic_write_json
 
 sys.stdout.reconfigure(line_buffering=True)
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+faulthandler.enable()
 
-from isaacsim import SimulationApp
-
-_p = argparse.ArgumentParser()
-_p.add_argument("--headless", action="store_true")
-_p.add_argument("--curobo", action="store_true", help="Use cuRobo GPU motion planner (default: IK+LERP)")
-_p.add_argument("--rmpflow", action="store_true", help="Use RMPFlow instead of IK+LERP")
-_p.add_argument("--lerp-speed", type=float, default=0.07, help="Interpolation speed for IK+LERP (0-1)")
-_p.add_argument("--perception", action="store_true",
-                help="Use 3D camera + top-object detection for pick targets "
-                     "(instead of simulator ground-truth cube positions)")
-_a = _p.parse_args()
-simulation_app = SimulationApp({"headless": _a.headless})
-
-import numpy as np
-from isaacsim.core.api import World
-from isaacsim.core.utils.viewports import set_camera_view
-
-from src.sorter.planning.pick_place_controller import PickPlaceController
-from src.sorter.perception.depth_camera import DepthCameraManager
-from src.sorter.perception.object_detector import TopObjectDetector
-from src.sorter.tasks.pick_place import PickPlace
-
-WARMUP_FRAMES = int(os.environ.get("WARMUP_FRAMES", "60"))
-SAVE_INTERVAL = 200  # save camera images every N steps
+p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--headless', action='store_true')
+p.add_argument('--trials', type=int, default=2)
+p.add_argument('--model', default='models/inspection/classifier.pt')
+p.add_argument('--sequence', default='good,defect', help='Appearance sequence; truth is used only by evaluation')
+p.add_argument('--motion-only', choices=['good', 'defect', 'review'], help='Fixed destination for mechanical tests; bypasses AI')
+p.add_argument('--output-dir', default='artifacts/run')
+p.add_argument('--record-dir', help='Save camera-only frames, no desktop or terminal')
+p.add_argument('--record-every', type=int, default=10, help='Physics steps per frame (dt=0.005)')
+p.add_argument('--continue-after-failure', action='store_true', help='Evaluation only: reset each failed trial; default stops')
+p.add_argument('--phase-timeout', type=float, default=15.)
+p.add_argument('--ee-offset', type=float, default=.20)
+p.add_argument('--joint-speed', type=float, default=.9)
+a = p.parse_args()
+if a.trials < 1 or a.record_every < 1:
+    p.error('trials and record-every must be positive')
+if not all(math.isfinite(value) and value > 0 for value in (a.phase_timeout, a.ee_offset, a.joint_speed)):
+    p.error('phase-timeout, ee-offset and joint-speed must be finite and positive')
+sequence = a.sequence.split(',')
+if any(value not in ('good', 'defect') for value in sequence):
+    p.error('sequence must contain good/defect')
 
 
-def _write_metrics(cycles: list[dict], mode: str, events_dt, args) -> None:
-    out_path = os.environ.get("METRICS_OUT")
-    if not out_path:
-        return
-    n = len(cycles)
-    succ = sum(1 for c in cycles if c["success"])
-    avg_cycle = sum(c["cycle_time"] for c in cycles) / n if n else 0.0
-    avg_vel_rms = sum(c["vel_rms"] for c in cycles) / n if n else 0.0
-    max_vel = max((c["vel_max"] for c in cycles), default=0.0)
+def _safe_error(stage, error):
+    """Persist useful error context without exception paths or personal details."""
+    return f'{stage}: {type(error).__name__}'
+
+
+def main():
+    output = Path(a.output_dir)
+    metrics_path = Path(os.environ.get('METRICS_OUT', str(output / 'metrics.json')))
+    # Logs append, while metrics and images use fixed names. Refuse reuse so a
+    # previous inspection can never silently point at a newly overwritten image.
+    protected = [output / name for name in ('metrics.json', 'inspections.csv', 'inspections.jsonl')]
+    if metrics_path.exists() or any(path.exists() for path in protected) or any(output.glob('inspection_*.png')):
+        print('[error] Output already contains inspection results; use a new output directory.', file=sys.stderr)
+        return 2
+    if a.record_dir and any(Path(a.record_dir).glob('frame_*.png')):
+        print('[error] Recording frames already exist; use a new recording directory.', file=sys.stderr)
+        return 2
+
+    output.mkdir(parents=True, exist_ok=True)
+    logger = InspectionLog(output)
+    run_id = uuid.uuid4().hex
+    cycles = []
     payload = {
-        "config": {
-            "mode": mode,
-            "perception": bool(args.perception),
-            "lerp_speed": args.lerp_speed,
-            "events_dt": events_dt,
-            "warmup_frames": WARMUP_FRAMES,
-            "label": os.environ.get("CONFIG_LABEL", ""),
+        'run_id': run_id,
+        'config': {
+            'controller': 'fixed-cell IK feedback', 'motion_only': a.motion_only,
+            'physics_dt': 1 / 200, 'ee_offset': a.ee_offset,
+            'joint_speed': a.joint_speed, 'sequence': sequence, 'trials_requested': a.trials,
+            'stop_on_failure': not a.continue_after_failure,
+            'renderer': 'RaytracedLighting', 'anti_aliasing': 0,
+            'record_every': a.record_every, 'record_fps': 200 / a.record_every,
         },
-        "summary": {
-            "cycles": n,
-            "success": succ,
-            "success_rate": succ / n if n else 0.0,
-            "avg_cycle_time": avg_cycle,
-            "avg_vel_rms": avg_vel_rms,
-            "max_vel": max_vel,
-        },
-        "cycles": cycles,
+        'cycles': cycles,
     }
-    with open(out_path, "w") as f:
-        json.dump(payload, f, indent=2)
-    print(f"[metrics] wrote {out_path}")
 
+    def persist(status='running', stop_reason=None):
+        n = len(cycles)
+        successes = sum(record['success'] for record in cycles)
+        ai_decisions = [record for record in cycles if record.get('decision', {}).get('method') == 'cnn']
+        accepted = [record for record in ai_decisions if record.get('destination') in ('good', 'defect')]
+        payload['status'] = status
+        if stop_reason is not None:
+            payload['stop_reason'] = stop_reason
+        payload['summary'] = {
+            'cycles': n, 'success': successes, 'success_rate': successes / n if n else None,
+            'transfer_success': sum(record['transfer_success'] for record in cycles),
+            'review': sum(record.get('destination') == 'review' for record in cycles),
+            'ai_decisions': len(ai_decisions), 'accepted_decisions': len(accepted),
+            'classification_coverage': len(accepted) / len(ai_decisions) if ai_decisions else None,
+            'accepted_route_accuracy': sum(record['correct_route'] for record in accepted) / len(accepted) if accepted else None,
+        }
+        atomic_write_json(metrics_path, payload)
 
-def _parse_events_dt(raw: str | None) -> list[float] | None:
-    if not raw:
-        return None
-    vals = [float(x) for x in raw.split(",")]
-    if len(vals) != 10:
-        raise ValueError(f"EVENTS_DT must have 10 comma-separated floats, got {len(vals)}")
-    return vals
+    app = None
+    stage = 'initial_metrics'
+    exit_code = 1
+    try:
+        # A durable, empty run exists before model loading and simulator startup.
+        persist('starting')
+        stage = 'configuration'
+        effective_offset = float(os.environ.get('EE_OFFSET', a.ee_offset))
+        if not math.isfinite(effective_offset) or effective_offset <= 0:
+            raise ValueError('invalid end-effector offset')
+        payload['config']['ee_offset'] = effective_offset
+        stage = 'model_checkpoint_check'
+        if not a.motion_only and not Path(a.model).is_file():
+            raise FileNotFoundError('model checkpoint unavailable')
+        stage = 'simulation_startup'
+        print('[startup] SimulationApp begin')
+        from isaacsim import SimulationApp
+        app = SimulationApp({
+            'headless': a.headless, 'width': 960, 'height': 720,
+            'renderer': 'RaytracedLighting', 'anti_aliasing': 0,
+        })
+        print('[startup] SimulationApp ready')
+        stage = 'simulation_imports'
+        import numpy as np
+        from PIL import Image
+        from isaacsim.core.api import World
+        from isaacsim.core.utils.types import ArticulationAction
+        from isaacsim.sensors.camera import Camera
+        from isaacsim.core.utils.viewports import set_camera_view
+        from src.sorter.cell_scene import (
+            create_scene, initialize_camera, set_appearance, capture_rgb,
+            SOURCE, PART_SIZE, TRAYS, FLOOR_Z, TRAY_WIDTH,
+        )
+        from src.sorter.measurement import TrayBounds, PlacementMonitor
+        from src.sorter.planning.fixed_cell_controller import FixedCellController
 
+        stage = 'world_creation'
+        print('[startup] World begin')
+        world = World(stage_units_in_meters=1., physics_dt=1 / 200, rendering_dt=1 / 20)
+        stage = 'scene_creation'
+        scene = create_scene(world)
+        stage = 'world_reset'
+        print('[startup] reset begin')
+        world.reset()
+        print('[startup] reset ready')
+        robot, part = scene['robot'], scene['part']
+        initial = robot.get_joint_positions().copy()
+        print(f'[cell] robot DOF={robot.num_dof} joints={robot.dof_names}')
+        names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+                 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint', 'finger_joint']
+        for name, value in zip(names, [0., -1.57, 1.57, -1.57, -1.57, 0., 0.]):
+            initial[robot.get_dof_index(name)] = value
+        stage = 'camera_initialization'
+        initialize_camera(scene)
+        overview = None
+        if a.record_dir:
+            Path(a.record_dir).mkdir(parents=True, exist_ok=True)
+            overview = Camera('/World/overview', name='overview', resolution=(960, 720), frequency=20)
+            overview.initialize()
+            overview.set_frequency(-1)
+            overview.set_clipping_range(.01, 20.)
+            overview.set_focal_length(.022)
+            overview.set_horizontal_aperture(.036)
+            set_camera_view(eye=np.array([1.35, 1.65, 1.45]), target=np.array([0., .38, .22]), camera_prim_path='/World/overview')
+        set_camera_view(eye=np.array([1.35, 1.65, 1.45]), target=np.array([0., .38, .22]))
+        classifier = None
+        if not a.motion_only:
+            stage = 'classifier_initialization'
+            from src.sorter.vision import SorterClassifier
+            classifier = SorterClassifier(a.model)
+        frame_index, tick = 0, 0
 
-def main() -> None:
-    my_world = World(stage_units_in_meters=1.0, physics_dt=1 / 200, rendering_dt=20 / 200)
+        def step():
+            nonlocal tick, frame_index
+            if not app.is_running() or not world.is_playing():
+                raise RuntimeError('simulation is not playing')
+            before = world.current_time_step_index
+            # render=True may advance a rendering interval rather than exactly
+            # one physics step. Advance physics once, then render separately.
+            world.step(render=False, update_fabric=True)
+            if world.current_time_step_index != before + 1:
+                raise RuntimeError('physics step did not advance exactly once')
+            tick += 1
+            if tick % 5 == 0 or (overview is not None and tick % a.record_every == 0):
+                world.render()
+            if overview is not None and tick % a.record_every == 0:
+                rgb = np.asarray(overview.get_rgb())
+                if rgb.ndim == 3 and rgb.shape[2] >= 3 and np.isfinite(rgb).all():
+                    Image.fromarray(rgb[:, :, :3].astype(np.uint8)).save(Path(a.record_dir) / f'frame_{frame_index:06d}.png')
+                    frame_index += 1
 
-    from src.sorter.config import BIN_POSITION, BIN_SIZE, DEST_BIN_POSITION
-    cube_half_h = 0.0515 / 2.0
-    # Main cube at the source bin center (most reliable pick location).
-    cube_start = BIN_POSITION.copy()
-    cube_start[2] = 0.4  # above 2x-scaled bin walls
-    # Place target inside destination bin
-    target_position = DEST_BIN_POSITION.copy()
-    target_position[2] = cube_half_h
-    my_task = PickPlace(
-        name="ur10e_pick_place",
-        cube_initial_position=cube_start,
-        target_position=target_position,
-        cube_size=np.array([0.1, 0.0515, 0.1]),
-    )
-    my_world.add_task(my_task)
-    my_world.reset()
-
-    # Viewport camera: top-down view
-    set_camera_view(eye=[0, 0.8, 3], target=[0, 0.4, 0])
-
-    # Overhead 3D camera + top-object detector (enabled via --perception).
-    camera_mgr: DepthCameraManager | None = None
-    detector: TopObjectDetector | None = None
-    if _a.perception:
-        camera_mgr = DepthCameraManager()
-        camera_mgr.initialize()
-        detector = TopObjectDetector()
-
-    print(f"Warming up ({WARMUP_FRAMES} frames)...")
-    for _ in range(WARMUP_FRAMES):
-        my_world.step(render=True)
-
-    task_params = my_world.get_task("ur10e_pick_place").get_params()
-    ur10e_name = task_params["robot_name"]["value"]
-    my_ur10e = my_world.scene.get_object(ur10e_name)
-
-    events_dt_override = _parse_events_dt(os.environ.get("EVENTS_DT"))
-    my_controller = PickPlaceController(
-        name="controller",
-        robot_articulation=my_ur10e,
-        gripper=my_ur10e.gripper,
-        use_curobo=_a.curobo,
-        use_ik_lerp=not _a.curobo and not _a.rmpflow,
-        interpolation_speed=_a.lerp_speed,
-        events_dt=events_dt_override,
-    )
-    articulation_controller = my_ur10e.get_articulation_controller()
-
-    reset_needed = False
-    step_count = 0
-
-    # Queue of cubes to pick — simplified to 1 cube for cuRobo validation.
-    # 2 cubes: main at bin center (picked first), then red at +Y offset.
-    cube_names = [task_params["cube_name"]["value"], "red_cube"]
-    cube_index = 0
-    current_done = False
-    # Perception override for the pick position/yaw for the current cycle.
-    perception_pick_pos: np.ndarray | None = None
-    perception_pick_yaw: float = 0.0
-
-    mode = "cuRobo" if _a.curobo else ("RMPFlow" if _a.rmpflow else "IK+LERP")
-    perception_tag = " +perception" if _a.perception else ""
-    print(f"=== UR10e Pick and Place ({mode}{perception_tag}) — {len(cube_names)} cubes ===")
-    t_start = time.time()
-    cycle_start = t_start
-
-    # Smoothness metrics: running sum of |v|^2 and max |v| per cycle.
-    vel_sq_sum = 0.0
-    vel_max = 0.0
-    vel_samples = 0
-    cycles: list[dict] = []
-
-    while simulation_app.is_running():
-        my_world.step(render=True)
-
-        if my_world.is_playing():
-            if reset_needed:
-                my_world.reset()
-                for _ in range(WARMUP_FRAMES):
-                    my_world.step(render=True)
-                my_controller.reset()
-                reset_needed = False
-                cube_index = 0
-                current_done = False
-                perception_pick_pos = None
-                perception_pick_yaw = 0.0
-                step_count = 0
-            if my_world.current_time_step_index == 0:
-                my_controller.reset()
-
-            step_count += 1
-
-            # All cubes done — wait for user to stop/reset
-            if cube_index >= len(cube_names):
-                continue
-
-            # Ground-truth cube position (always queried for success check).
-            cube_name = cube_names[cube_index]
-            cube_obj = my_world.scene.get_object(cube_name)
-            cube_pos, _ = cube_obj.get_world_pose()
-
-            # If perception is enabled, run detection once at the start of
-            # each new cycle and use the detected centroid as the pick pose.
-            if detector is not None and not current_done and perception_pick_pos is None:
-                label = cube_name if cube_name != task_params["cube_name"]["value"] else "cube"
-                pts, ids, id_to_labels = camera_mgr.get_labeled_pointcloud()
-                det = detector.detect_labeled_object(pts, ids, id_to_labels, label) \
-                    if pts is not None else None
-                if det is None:
-                    # Fall back to label-free top-object detection.
-                    pc = camera_mgr.get_pointcloud()
-                    det = detector.detect_top_object(pc) if pc is not None else None
-                if det is not None:
-                    # Use camera only for (X, Y); Z comes from the known cube
-                    # half-height (cube rests on the ground plane).
-                    adjusted = np.array(
-                        [det.position[0], det.position[1], cube_half_h],
-                        dtype=np.float64,
-                    )
-                    perception_pick_pos = adjusted
-                    perception_pick_yaw = det.yaw
-                    print(f"  [perception] label={label} xy=[{det.position[0]:.3f},"
-                          f"{det.position[1]:.3f}] z={cube_half_h:.3f} (known) "
-                          f"-> pick=[{adjusted[0]:.3f},{adjusted[1]:.3f},{adjusted[2]:.3f}] "
-                          f"yaw={det.yaw:+.2f} rad, pts={det.num_points}")
-                else:
-                    print(f"  [perception] no object detected for label={label}; "
-                          f"falling back to ground truth")
-                    perception_pick_yaw = 0.0
-
-            pick_pos_for_controller = (
-                perception_pick_pos if perception_pick_pos is not None else cube_pos
-            )
-
-            observations = my_world.get_observations()
-            # Joint velocity sampling for smoothness RMS.
+        persist()
+        for trial in range(a.trials):
+            start = time.monotonic()
+            simulation_start = world.current_time
+            truth = sequence[trial % len(sequence)]
+            control = None
+            fatal_trial_error = False
+            record = {
+                'run_id': run_id, 'trial': trial + 1, 'image': None, 'truth': truth,
+                'destination': None, 'decision': {}, 'success': False, 'transfer_success': False,
+                'correct_route': False, 'review': False, 'max_part_z': None,
+                'cycle_time': 0., 'simulation_seconds': 0., 'motion_simulation_seconds': 0.,
+                'final_position': None, 'placement': {}, 'phases': [],
+                'defect_score': None, 'confidence': None, 'settled_steps': 0,
+                'image_quality': None, 'failure_reason': '', 'reason': '',
+            }
+            placement, max_height = {}, None
             try:
-                jv = my_ur10e.get_joint_velocities()
-                if jv is not None:
-                    jv_arr = np.asarray(jv, dtype=np.float64)
-                    vel_sq_sum += float(np.sum(jv_arr * jv_arr))
-                    vmax = float(np.max(np.abs(jv_arr)))
-                    if vmax > vel_max:
-                        vel_max = vmax
-                    vel_samples += jv_arr.size
+                stage = 'trial_reset'
+                # Explicit supply reset only. No object pose commands occur
+                # during the subsequent robot-controlled transportation.
+                robot.set_joint_positions(initial.copy())
+                robot.set_joint_velocities(np.zeros(robot.num_dof))
+                robot.get_articulation_controller().apply_action(ArticulationAction(joint_positions=initial.copy()))
+                part.set_world_pose(position=SOURCE.copy(), orientation=np.array([1., 0, 0, 0]))
+                part.set_linear_velocity(np.zeros(3))
+                part.set_angular_velocity(np.zeros(3))
+                condition = {'gray': .65, 'dome': 65., 'key': 180., 'patch_x': 0., 'patch_y': 0.,
+                             'patch_w': .032, 'patch_h': .021, 'patch_gray': .06}
+                set_appearance(scene, condition, truth == 'defect')
+                for _ in range(80):
+                    step()
+                stage = 'inspection_capture'
+                image = np.asarray(capture_rgb(world, scene['camera'], frames=10))
+                if image.ndim != 3 or image.shape[2] < 3 or not np.isfinite(image).all():
+                    raise RuntimeError('invalid inspection image')
+                image = image[:, :, :3]
+                pixel_std = np.std(image.astype(np.float64), axis=(0, 1))
+                record['image_quality'] = {
+                    'min': float(image.min()), 'max': float(image.max()),
+                    'range': float(image.max()) - float(image.min()),
+                    'std': float(image.std()), 'spatial_std_max': float(pixel_std.max()),
+                    'shape': list(image.shape),
+                }
+                image_relative = f'inspection_{trial:03d}.png'
+                Image.fromarray(image.astype(np.uint8)).save(output / image_relative)
+                record['image'] = image_relative
+                if float(pixel_std.max()) <= 1e-6:
+                    stage = 'blank_inspection_image'
+                    raise RuntimeError('inspection image is spatially constant')
+                stage = 'image_classification'
+                if classifier is None:
+                    decision = {'label': a.motion_only, 'defect_score': None,
+                                'confidence': None, 'method': 'motion-only'}
+                else:
+                    decision = classifier.predict(image)  # Pixels only: no truth, names or physical state.
+                record.update(decision=decision, destination=decision['label'],
+                              defect_score=decision.get('defect_score'), confidence=decision.get('confidence'))
+                destination = decision['label']
+                if destination not in TRAYS:
+                    raise ValueError('classifier returned an invalid destination')
+                record['review'] = destination == 'review'
+                print(f'[inspection] trial={trial + 1} destination={destination} score={decision.get("defect_score")}')
+                center = TRAYS[destination]
+                tray = TrayBounds(
+                    destination,
+                    [center[0] - TRAY_WIDTH / 2, center[1] - TRAY_WIDTH / 2, FLOOR_Z - .005],
+                    [center[0] + TRAY_WIDTH / 2, center[1] + TRAY_WIDTH / 2, FLOOR_Z + .12],
+                    floor_z=FLOOR_Z,
+                )
+                monitor = PlacementMonitor(tray, required_steps=60)
+                place = np.array([center[0], center[1], FLOOR_Z + PART_SIZE[2] / 2])
+                stage = 'controller_initialization'
+                control = FixedCellController(robot, SOURCE.copy(), place, ee_offset=a.ee_offset,
+                                              max_joint_speed=a.joint_speed, phase_timeout=a.phase_timeout)
+                phase, sample_count = '', 0
+                stage = 'transportation'
+                while app.is_running() and not control.done and not control.failed:
+                    action = control.step()
+                    robot.get_articulation_controller().apply_action(action)
+                    step()
+                    pos, quat = part.get_world_pose()
+                    max_height = float(pos[2]) if max_height is None else max(max_height, float(pos[2]))
+                    if control.phase == 'transport' and phase != 'transport' and float(pos[2]) <= float(SOURCE[2]) + .06:
+                        control.abort('workpiece not lifted')
+                    placement = monitor.update(
+                        pos, PART_SIZE, part.get_linear_velocity(), part.get_angular_velocity(),
+                        released=control.released, orientation_wxyz=quat,
+                        gripper_clear=control.phase in ('retreat', 'done'),
+                    )
+                    if control.phase != phase:
+                        phase = control.phase
+                        print(f'[trial {trial + 1}] phase={phase} part={np.round(pos, 3).tolist()} finger={robot.get_joint_positions()[robot.get_dof_index("finger_joint")]:.3f}')
+                    sample_count += 1
+                    if sample_count % 600 == 0:
+                        print(f'[trial {trial + 1}] t={control.elapsed:.1f}s error={control.last_position_error:.4f} orientation={control.last_orientation_error:.3f}')
+                if control.done:
+                    stage = 'placement_settling'
+                    for _ in range(160):
+                        step()
+                        pos, quat = part.get_world_pose()
+                        placement = monitor.update(
+                            pos, PART_SIZE, part.get_linear_velocity(), part.get_angular_velocity(),
+                            released=True, orientation_wxyz=quat, gripper_clear=True,
+                        )
+                if not control.done and not control.failed:
+                    control.abort('simulation stopped')
+                transfer_success = bool(control.done and placement.get('success', False))
+                # review is an explicit deferral, reported separately from the
+                # good/defect accepted-route accuracy in the summary.
+                correct_route = classifier is None or destination == 'review' or destination == truth
+                success = bool(transfer_success and correct_route)
+                failure_reason = control.failure_reason if control.failed else (
+                    '' if success else ('wrong destination' if not correct_route else placement.get('reason', 'placement check failed'))
+                )
+                record.update(success=success, transfer_success=transfer_success,
+                              correct_route=correct_route, failure_reason=failure_reason,
+                              reason=failure_reason or placement.get('reason', ''))
+            except BaseException as error:
+                # Capture/classification/reset errors also become failed trial
+                # rows. They stop even an evaluation run, because the input or
+                # simulator state is no longer reliable.
+                reason = _safe_error(stage, error)
+                fatal_trial_error = True
+                record.update(failure_reason=reason, reason=reason, stop_reason=reason)
+                if control is not None:
+                    control.abort(reason)
+                print(f'[error] {reason}', file=sys.stderr)
+            record['cycle_time'] = time.monotonic() - start
+            record['simulation_seconds'] = max(0., float(world.current_time - simulation_start))
+            record['max_part_z'] = max_height
+            record['placement'] = placement
+            record['settled_steps'] = placement.get('settled_steps', 0)
+            if control is not None:
+                record['motion_simulation_seconds'] = control.elapsed
+                record['phases'] = control.phase_history
+            try:
+                position, _ = part.get_world_pose()
+                values = np.asarray(position, dtype=float)
+                if np.isfinite(values).all():
+                    record['final_position'] = values.tolist()
             except Exception:
                 pass
-            actions = my_controller.forward(
-                picking_position=pick_pos_for_controller,
-                placing_position=target_position,
-                current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-                end_effector_offset=np.array([0, 0, 0.20]),
-                pick_yaw=perception_pick_yaw,
-            )
-
-            if my_controller.is_done() and not current_done:
-                now = time.time()
-                elapsed = now - t_start
-                cycle_time = now - cycle_start
-                dist = float(np.linalg.norm(cube_pos[:2] - target_position[:2]))
-                success = dist < 0.15
-                vel_rms = (vel_sq_sum / vel_samples) ** 0.5 if vel_samples > 0 else 0.0
-                cycles.append({
-                    "cube": cube_name,
-                    "success": bool(success),
-                    "cycle_time": cycle_time,
-                    "dist": dist,
-                    "vel_rms": vel_rms,
-                    "vel_max": vel_max,
-                })
-                print(f"[{cube_index+1}/{len(cube_names)}] {cube_name}: "
-                      f"pos=[{cube_pos[0]:.3f},{cube_pos[1]:.3f},{cube_pos[2]:.3f}], "
-                      f"dist={dist:.3f}, SUCCESS={success}, "
-                      f"cycle={cycle_time:.2f}s, vel_rms={vel_rms:.3f}, "
-                      f"vel_max={vel_max:.3f}, total={elapsed:.2f}s")
-                current_done = True
-                # Reset per-cycle smoothness accumulators.
-                vel_sq_sum = 0.0
-                vel_max = 0.0
-                vel_samples = 0
-                cycle_start = now
-
-                cube_index += 1
-                if cube_index < len(cube_names):
-                    # Reset controller for next cube
-                    my_controller.reset()
-                    current_done = False
-                    perception_pick_pos = None  # force re-detection next cycle
-                    perception_pick_yaw = 0.0
-                    print(f"  → Next: {cube_names[cube_index]}")
-                else:
-                    print(f"=== All {len(cube_names)} cubes done! total_time={elapsed:.2f}s ===")
-                    _write_metrics(cycles, mode, events_dt_override, _a)
-                    if _a.headless or os.environ.get("METRICS_OUT"):
-                        break
-
-            articulation_controller.apply_action(actions)
-
-        if my_world.is_stopped():
-            reset_needed = True
-
-    simulation_app.close()
+            cycles.append(record)
+            stage = 'inspection_log_write'
+            logger.write(record)
+            if fatal_trial_error:
+                persist('error', record['reason'])
+                return 1
+            persist()
+            print(f'[result] trial={trial + 1} success={record["success"]} transfer={record["transfer_success"]} reason={record["failure_reason"]}')
+            if not record['success'] and not a.continue_after_failure:
+                persist('stopped_on_failure', record['reason'])
+                break
+        else:
+            persist('completed')
+        print('[result] ' + json.dumps(payload['summary']))
+        exit_code = 0 if len(cycles) == a.trials and all(record['success'] for record in cycles) else 1
+    except BaseException as error:
+        reason = _safe_error(stage, error)
+        print(f'[error] {reason}', file=sys.stderr)
+        try:
+            persist('error', reason)
+        except Exception:
+            print('[error] Unable to save error metrics.', file=sys.stderr)
+        exit_code = 1
+    finally:
+        if app is not None:
+            try:
+                app.close()
+            except Exception as error:
+                print(f'[error] {_safe_error("simulation_shutdown", error)}', file=sys.stderr)
+                exit_code = 1
+    return exit_code
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except Exception as error:
+        print(f'[error] {_safe_error("output_initialization", error)}', file=sys.stderr)
+        sys.exit(1)

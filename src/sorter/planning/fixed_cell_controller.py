@@ -100,6 +100,7 @@ class FixedCellController:
         self._stable_elapsed = 0.0
         self._ik_failed_elapsed = 0.0
         self._elapsed = 0.0
+        self._pose_logged = False
         self._hold_positions = np.array(robot.get_joint_positions(), dtype=float, copy=True)
         self._failed = False
         self._released = False
@@ -176,6 +177,18 @@ class FixedCellController:
         position = np.asarray(position, dtype=float)
         orientation = np.asarray(orientation, dtype=float)
         orientation /= np.linalg.norm(orientation)
+        if not self._pose_logged and (self._phase_elapsed >= 2.0 or self._phase_elapsed <= self.physics_dt):
+            fk_position, fk_orientation = self._ik.compute_end_effector_pose()
+            print(
+                f"[cell-pose] phase={self.phase} t={self._phase_elapsed:.3f}s "
+                f"actual_position={np.round(position,5).tolist()} "
+                f"actual_quat={np.round(orientation,5).tolist()} "
+                f"fk_position={np.round(fk_position,5).tolist()} "
+                f"fk_quat={np.round(fk_orientation,5).tolist()} "
+                f"target_quat={np.round(self.orientation,5).tolist()}",
+                flush=True,
+            )
+            self._pose_logged = self._phase_elapsed >= 2.0
         cosine = abs(float(np.dot(orientation, self.orientation)))
         return float(np.linalg.norm(position - target)), float(2 * np.arccos(np.clip(cosine, 0, 1)))
 
@@ -196,6 +209,7 @@ class FixedCellController:
         self._hold_positions = np.array(self.robot.get_joint_positions(), dtype=float, copy=True)
         self._index += 1
         self._phase_elapsed = self._stable_elapsed = self._ik_failed_elapsed = 0.0
+        self._pose_logged = False
 
     def step(self) -> ArticulationAction:
         if self.failed or self.done:
