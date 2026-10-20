@@ -121,6 +121,15 @@ class FixedCellController:
         self._ik = _FixedCellIK(robot, self.physics_dt, float(max_joint_speed))
         self._arm_indices = np.array(self._ik._joints_subset.joint_indices, dtype=int)
         self._finger_indices = np.array(robot.gripper.active_joint_indices, dtype=int)
+        finger_properties=robot.dof_properties[self._finger_indices]
+        self._finger_lower=np.asarray(finger_properties['lower'],dtype=float)
+        self._finger_upper=np.asarray(finger_properties['upper'],dtype=float)
+        print(
+            f"[cell-gripper] limits_rad={list(zip(self._finger_lower.tolist(),self._finger_upper.tolist()))} "
+            f"stiffness={finger_properties['stiffness'].tolist()} "
+            f"damping={finger_properties['damping'].tolist()} "
+            f"max_effort={finger_properties['maxEffort'].tolist()}",flush=True,
+        )
         self.gripper_speed = float(gripper_speed)
         self._finger_commanded_positions = np.asarray(robot.get_joint_positions(),dtype=float)[self._finger_indices].copy()
         self._index = 0
@@ -331,14 +340,24 @@ class FixedCellController:
             if not pose_ok and self._phase_elapsed > 0.35:
                 self.abort(f"arm moved during {phase}")
                 return self._hold_action()
-            finger_speed = np.asarray(self.robot.get_joint_velocities(), dtype=float)[self._finger_indices]
-            settled = bool(np.max(np.abs(finger_speed)) < 0.15)
+            finger_position = np.asarray(self.robot.get_joint_positions(), dtype=float)[self._finger_indices]
+            if (not np.all(np.isfinite(finger_position)) or
+                np.any(finger_position<self._finger_lower-0.005) or
+                np.any(finger_position>self._finger_upper+0.005)):
+                self.abort(f"finger joint outside physical limits during {phase}")
+                return self._hold_action()
             desired=(self.robot.gripper.joint_closed_positions if phase=='close'
                      else self.robot.gripper.joint_opened_positions)
-            settled=settled and bool(np.max(np.abs(self._finger_commanded_positions-desired))<0.005)
+            command_reached=bool(np.max(np.abs(self._finger_commanded_positions-desired))<0.005)
+            # Contact preload can produce high-frequency joint-velocity jitter.
+            # Closing is an action, not evidence that a grasp succeeded: main
+            # separately requires a physical lift, then a released, still part
+            # fully inside its tray. Do not mistake loaded finger velocity for
+            # a failed grasp before that actual lift test.
+            settled=pose_ok and command_reached
             if phase == "open":
-                finger_position = np.asarray(self.robot.get_joint_positions(), dtype=float)[self._finger_indices]
-                settled = settled and bool(np.max(np.abs(finger_position)) < 0.08)
+                finger_speed = np.asarray(self.robot.get_joint_velocities(), dtype=float)[self._finger_indices]
+                settled = settled and bool(np.max(np.abs(finger_position)) < 0.08) and bool(np.max(np.abs(finger_speed))<0.15)
         else:
             waypoint=self._cartesian_waypoint(phase,target)
             arm = self._ik.forward(waypoint, self.orientation)

@@ -1,8 +1,8 @@
 # AI外観検査・仕分けセル
 
-Physical AI 応用1講座の最終課題。Isaac Sim 上の UR10e + Robotiq 系平行グリッパーで直方体部品を撮影し、小型 CNN が上面の模擬汚れを判定して「良品 / 不良品 / 要確認」のトレイに運び分ける。
+Physical AI 応用1講座の最終課題。Isaac Sim 上の UR10e + Robotiq 2F-85 で直方体部品を撮影し、小型 CNN が上面の模擬汚れを判定して「良品 / 不良品 / 要確認」のトレイに運び分ける。
 
-計画では Robotiq 2F-85 を想定しているが、現在参照する NVIDIA の `ur_gripper.usd` と運動学用 URDF には **2F-140 由来のメッシュ名** が含まれる。2F-85 と同一の寸法・開口・把持挙動であることは未確認であり、本実装を2F-85の再現とは断定しない。
+標準プロファイルは NVIDIA 組立済み UR10e の **native Robotiq 2F-85 variant**。流用元のチュートリアルアセットには2F-140由来のメッシュが含まれていたため、85用の参照と運動学定義を追加して切り替えた。物理搬送の成功範囲と試行件数は [docs/RESULTS.md](docs/RESULTS.md) を参照。
 
 供給位置と姿勢は固定し、部品を1個ずつ検査する。部品の供給装置や実機への接続は対象外。分類器への入力は RGB 画像だけで、シミュレータの正解ラベル・物体名・搬送先を特徴に使わない。
 
@@ -21,6 +21,7 @@ scripts/baseline.py             流用元の搬送ベースライン
 scripts/summarize_runs.py       搬送 metrics JSON / 検査 JSONL の集計
 scripts/make_video.py           カメラ PNG 連番から MP4 を作成
 src/sorter/cell_scene.py        部品・模擬汚れ・照明・カメラ・3トレイ
+src/sorter/robot_profiles.py    組立済みnative 2F-85 variantを参照
 src/sorter/vision/              前処理・CNN・画像だけの推論・評価
 src/sorter/planning/            ロボットの把持・搬送制御
 src/sorter/measurement.py       全体形状・開放後静止の検証、CSV / JSONL
@@ -42,10 +43,10 @@ export ISAAC_ROOT=/path/to/IsaacSim/release
 
 `ISAAC_PYTHON` で `python.sh` 自体の場所も指定できる。初期値は `ISAAC_ROOT/python.sh`。ランチャーは GB10 の実行に必要な Isaac 同梱 PyTorch ライブラリへの参照を追加する。システム Python へのパッケージ追加や sudo は不要。
 
-初回のロボットアセット取得にはネットワークと待ち時間が必要。既存のローカルアセットを利用する場合は `ROBOT_USD`、アセットの参照ルートを変える場合は `ISAAC_ASSET_ROOT` を指定する。
+初回のロボットアセット取得にはネットワークと待ち時間が必要。アセットの参照ルートは `ISAAC_ASSET_ROOT` で指定できる。標準の85プロファイルは、その配下の組立済みUR10e USDAを参照する。
 
 ```bash
-export ROBOT_USD=/path/to/ur_gripper.usd
+export ISAAC_ASSET_ROOT=/path/to/Isaac/6.0
 ```
 
 アセット本体は公開リポジトリにコピーしない。起動が止まったように見える場合は `[startup]` の最後の段階と Isaac の警告・例外を確認する。モデル学習時には SimulationApp を起動する必要はない。
@@ -92,6 +93,22 @@ CNN は 64×64 RGB を入力とする3層の小型畳み込みモデルで、学
 ```
 
 `--sequence` はシミュレータで生成する部品の順番であり、分類器には渡さない。`good` が良品、`defect` が模擬汚れあり。行先は撮影画像への推論結果で選択する。要確認の発生は val で固定した信頼度範囲による。
+
+標準は `--robot-profile robotiq85 --ee-offset 0.13`。85の開いたpadはbaseからZ方向に約0.110〜0.148 m、中央0.1294 mにあるため、オフセット0.13 mで部品中心付近を挟む。base姿勢は下向き・yaw=0で、指はworld Y方向から短辺0.0515 mを挟む。これらは静的形状から決めた初期設定であり、把持成功率は実測で確認する。
+
+制御は200 Hzで1物理ステップずつ進め、描画を分離する。手先はCartesian空間の直線経路に沿ってIKを更新し、関節指令に0.9 rad/sの上限を設ける。主な標準設定は次のとおり。
+
+| 設定 | 値 |
+|---|---|
+| 接近 / 搬送 | 0.15 / 0.12 m/s |
+| 下降 / 置き下降 | 0.04 / 0.04 m/s |
+| 持上げ / 退避 | 0.08 / 0.08 m/s |
+| 部品質量 | 0.2 kg |
+| グリッパー角度指令の変化上限 | 0.4 rad/s |
+| グリッパーangular drive | `damping=2`, `maxForce=8` |
+| 指のmimic関係 | native `Physx_Mimic` を維持 |
+
+把持できていないまま搬送を続けないよう、持上げ後に部品高さを検査する。比較用の旧140アセットは `--robot-profile legacy140 --ee-offset 0.20` で明示的に選べる。旧アセットのUSDを直接指定する場合だけ `ROBOT_USD` を使用する。85と140の結果は別に集計する。
 
 分類器を使わず、搬送機構だけを個別に検証する例:
 
@@ -157,6 +174,8 @@ python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 2
 
 既存の Isaac Sim 搬送実験から、`planning/` の IK・把持搬送制御、`tasks/`、`perception/` の必要なコードをコピーしている。元の実験リポジトリへの実行時依存はない。今回の課題用に部品・汚れ・検査用シーン、小型 CNN と明度比較、条件分離、判定接続、厳密な成功測定、検査ログ・録画を追加した。現在の `fixed_cell_controller.py` はコピーした IK 実装を基に、関節インデックス処理、収束確認、段階ごとの停止判定を組み立てている。
 
-`src/sorter/planning/rmpflow/ur10e.urdf`、`robot_descriptor.yaml`、`ur10e_rmpflow_common.yaml` は NVIDIA Isaac Sim の UR10e サンプルに由来する運動学定義・設定。YAML 内の NVIDIA 著作権表示・Apache-2.0 のヘッダーを保持している。利用・再配布条件は各ファイルおよび取得元の条件を確認する。
+`src/sorter/planning/rmpflow/ur10e.urdf`、`robot_descriptor.yaml`、`ur10e_rmpflow_common.yaml` は NVIDIA Isaac Sim の UR10e サンプルに由来する運動学定義・設定。YAML 内の NVIDIA 著作権表示・Apache-2.0 のヘッダーを保持している。85用の [profiles/ur10e_85](src/sorter/planning/profiles/ur10e_85/README.md) は既存arm6軸とrootの数値だけを再利用し、指・メッシュなしのIK専用URDFとdescriptorを用意した。利用・再配布条件は各ファイルおよび取得元の条件を確認する。
 
-表示・接触計算用のロボットは NVIDIA Isaac Sim 6.0 アセットの `Isaac/Samples/Rigging/Manipulator/configure_manipulator/ur10e/ur/ur_gripper.usd` を実行時に参照する。USD 本体・メッシュ・テクスチャ・Isaac Sim 本体はリポジトリへ同梱しない。URDF に記載されたメッシュ名は元アセット由来の参照であり、同名メッシュのコピーは含めない。アセット利用条件は NVIDIA の配布条件に従う。
+85用armの局所変換・ゼロ姿勢FKとUSDとの最大成分誤差は1.47e-7、マウントは1.63e-7以下で、許容1e-6以内。`static_evidence.json` に参照URL・SHA256・比較値を保存した。実行時にも、USDの手先実姿勢とLula FKがログの表示精度で一致したことを確認している。この整合性確認は、物理搬送の成功確認とは分けて扱う。
+
+表示・接触計算用の標準ロボットは NVIDIA Isaac Sim 6.0 の `Isaac/Robots_Multiphysics/UniversalRobots/ur10e/ur10e.usda` を実行時に参照し、`Physics=physx` / `Gripper=Robotiq_2F_85` を選択する。比較用140だけは `Isaac/Samples/Rigging/Manipulator/configure_manipulator/ur10e/ur/ur_gripper.usd` を参照する。USD 本体・メッシュ・テクスチャ・Isaac Sim 本体はリポジトリへ同梱しない。旧URDFに記載されたメッシュ名も元アセット由来の参照であり、同名メッシュのコピーは含めない。アセット利用条件は NVIDIA の配布条件に従う。

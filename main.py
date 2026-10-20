@@ -25,13 +25,14 @@ p.add_argument('--motion-only', choices=['good', 'defect', 'review'], help='Fixe
 p.add_argument('--output-dir', default='artifacts/run')
 p.add_argument('--record-dir', help='Save camera-only frames, no desktop or terminal')
 p.add_argument('--record-every', type=int, default=10, help='Physics steps per frame (dt=0.005)')
+p.add_argument('--render-every', type=int, default=20, help='Physics steps per non-recording render')
 p.add_argument('--continue-after-failure', action='store_true', help='Evaluation only: reset each failed trial; default stops')
 p.add_argument('--phase-timeout', type=float, default=15.)
 p.add_argument('--robot-profile', choices=['robotiq85','legacy140'], default='robotiq85')
 p.add_argument('--ee-offset', type=float, default=.13)
 p.add_argument('--joint-speed', type=float, default=.9)
 a = p.parse_args()
-if a.trials < 1 or a.record_every < 1:
+if a.trials < 1 or a.record_every < 1 or a.render_every < 1:
     p.error('trials and record-every must be positive')
 if not all(math.isfinite(value) and value > 0 for value in (a.phase_timeout, a.ee_offset, a.joint_speed)):
     p.error('phase-timeout, ee-offset and joint-speed must be finite and positive')
@@ -72,6 +73,7 @@ def main():
             'stop_on_failure': not a.continue_after_failure,
             'renderer': 'RaytracedLighting', 'anti_aliasing': 0,
             'record_every': a.record_every, 'record_fps': 200 / a.record_every,
+            'render_every':a.render_every,
         },
         'cycles': cycles,
     }
@@ -108,6 +110,9 @@ def main():
         stage = 'model_checkpoint_check'
         if not a.motion_only and not Path(a.model).is_file():
             raise FileNotFoundError('model checkpoint unavailable')
+        if not a.motion_only:
+            import hashlib
+            payload['config']['model_sha256']=hashlib.sha256(Path(a.model).read_bytes()).hexdigest()
         stage = 'simulation_startup'
         print('[startup] SimulationApp begin')
         from isaacsim import SimulationApp
@@ -178,7 +183,7 @@ def main():
             if world.current_time_step_index != before + 1:
                 raise RuntimeError('physics step did not advance exactly once')
             tick += 1
-            if tick % 5 == 0 or (overview is not None and tick % a.record_every == 0):
+            if tick % a.render_every == 0 or (overview is not None and tick % a.record_every == 0):
                 world.render()
             if overview is not None and tick % a.record_every == 0:
                 rgb = np.asarray(overview.get_rgb())
@@ -219,7 +224,7 @@ def main():
                 for _ in range(80):
                     step()
                 stage = 'inspection_capture'
-                image = np.asarray(capture_rgb(world, scene['camera'], frames=10))
+                image = np.asarray(capture_rgb(world, scene['camera'], frames=10, physics_step=step))
                 if image.ndim != 3 or image.shape[2] < 3 or not np.isfinite(image).all():
                     raise RuntimeError('invalid inspection image')
                 image = image[:, :, :3]

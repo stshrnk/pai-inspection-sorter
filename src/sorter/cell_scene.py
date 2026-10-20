@@ -164,13 +164,16 @@ def set_appearance(scene, condition, defective):
         patch.MakeInvisible()
 
 
-def capture_rgb(world, camera, frames=5):
+def capture_rgb(world, camera, frames=5, physics_step=None):
     # Keep physics at its configured dt. World.step(render=True) may perform
     # extra physics substeps to meet rendering_dt, which must not advance a
     # controller by a different number of ticks than its commands.
     previous_time=float(camera.get_current_frame().get('rendering_time',0.))
     for _ in range(max(60,int(frames))):
-        world.step(render=False)
+        if physics_step is None:
+            world.step(render=False,update_fabric=True)
+        else:
+            physics_step()
         world.render()
     rgb=np.asarray(camera.get_rgb())
     if rgb.ndim!=3 or rgb.shape[2]<3 or not np.isfinite(rgb).all():

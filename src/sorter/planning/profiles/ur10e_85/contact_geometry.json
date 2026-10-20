@@ -1,0 +1,56 @@
+{
+  "verification": "Static mesh extents read in memory only; not a simulated contact test",
+  "source": "https://omniverse-content-staging.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Robotiq/2F-85/payloads/geometries.usd",
+  "source_bytes": 3990300,
+  "mesh": "/Geometries/Defeatured_2F_85_PAD_OPEN_fingertipsstep/Defeatured_2F_85_PAD_OPEN_fingertipsstep",
+  "point_count": 384,
+  "mesh_min_m": [
+    -0.06270762532949448,
+    0.11041999608278275,
+    -0.010999999940395355
+  ],
+  "mesh_max_m": [
+    -0.043548423796892166,
+    0.14842018485069275,
+    0.010999999940395355
+  ],
+  "left_visual_orientation_wxyz": [
+    0.5,
+    0.5,
+    0.5,
+    0.5
+  ],
+  "left_pad_base_min_m": [
+    -0.010999999940395355,
+    -0.06270762532949448,
+    0.11041999608278275
+  ],
+  "left_pad_base_max_m": [
+    0.010999999940395355,
+    -0.043548423796892166,
+    0.14842018485069275
+  ],
+  "right_pad_base_min_m": [
+    -0.010999999940395355,
+    0.043548423796892166,
+    0.11041999608278275
+  ],
+  "right_pad_base_max_m": [
+    0.010999999940395355,
+    0.06270762532949448,
+    0.14842018485069275
+  ],
+  "pad_z_midpoint_m": 0.12942009046673775,
+  "open_visual_inner_gap_m": 0.08709684759378433,
+  "native_closing_direction_base": [
+    0,
+    1,
+    0
+  ],
+  "recommended_initial_ee_offset_m": 0.13,
+  "limits": [
+    "The visual extent gives an initial grasp-height estimate, not a contact-force or success guarantee.",
+    "At the base orientation roll=0,pitch=pi,yaw=0, jaw separation follows world Y.",
+    "Adding yaw=pi/2 puts separation along world X; the 0.10m part exceeds the visual open gap."
+  ]
+}
