@@ -28,6 +28,9 @@ class _FixedCellIK(IKLerpController):
         self._physics_dt = physics_dt
         self.max_joint_speed = max_joint_speed
         self.ik_ok = False
+        self._commanded_cspace_positions = None
+        self.tracking_limited_elapsed = 0.0
+        self.tracking_error = 0.0
         self._kinematics_solver.set_default_cspace_seeds([self.ELBOW_UP_SEED])
 
     def forward(self, target_end_effector_position, target_end_effector_orientation=None):
@@ -43,11 +46,25 @@ class _FixedCellIK(IKLerpController):
             self._target_cspace_positions = target.copy()
         if self._target_cspace_positions is None:
             return self._joints_subset.make_articulation_action(current, None)
-        error = self._target_cspace_positions - current
+        if self._commanded_cspace_positions is None:
+            self._commanded_cspace_positions = current.copy()
+        tracking = self._commanded_cspace_positions - current
+        tracking = np.arctan2(np.sin(tracking), np.cos(tracking))
+        self.tracking_error = float(np.max(np.abs(tracking)))
+        if self.tracking_error > 0.30:
+            # Do not integrate farther into a collision or a stalled drive.
+            self.tracking_limited_elapsed += self._physics_dt
+            return self._joints_subset.make_articulation_action(self._commanded_cspace_positions.copy(), None)
+        self.tracking_limited_elapsed = 0.0
+        error = self._target_cspace_positions - self._commanded_cspace_positions
         error = np.arctan2(np.sin(error), np.cos(error))
         limit = self.max_joint_speed * self._physics_dt
         delta = np.clip(0.12 * error, -limit, limit)
-        return self._joints_subset.make_articulation_action(current + delta, None)
+        # Integrate from the previous COMMAND, not measured joint position.
+        # Otherwise current+tiny_delta yields a weak effective position drive
+        # that can settle with a large gravity-induced end-effector error.
+        self._commanded_cspace_positions += delta
+        return self._joints_subset.make_articulation_action(self._commanded_cspace_positions.copy(), None)
 
 
 class FixedCellController:
@@ -188,6 +205,19 @@ class FixedCellController:
                 f"target_quat={np.round(self.orientation,5).tolist()}",
                 flush=True,
             )
+            current=np.asarray(self._ik._joints_subset.get_joint_positions(),dtype=float)
+            target_q=self._ik._target_cspace_positions
+            command_q=self._ik._commanded_cspace_positions
+            velocity=np.asarray(self.robot.get_joint_velocities(),dtype=float)[self._arm_indices]
+            print(
+                f"[cell-joints] phase={self.phase} "
+                f"current={np.round(current,4).tolist()} "
+                f"ik_target={None if target_q is None else np.round(target_q,4).tolist()} "
+                f"command={None if command_q is None else np.round(command_q,4).tolist()} "
+                f"velocity={np.round(velocity,4).tolist()} "
+                f"tracking_error={self._ik.tracking_error:.4f}rad",
+                flush=True,
+            )
             self._pose_logged = self._phase_elapsed >= 2.0
         cosine = abs(float(np.dot(orientation, self.orientation)))
         return float(np.linalg.norm(position - target)), float(2 * np.arccos(np.clip(cosine, 0, 1)))
@@ -250,6 +280,9 @@ class FixedCellController:
                 settled = settled and bool(np.max(np.abs(finger_position)) < 0.08)
         else:
             arm = self._ik.forward(target, self.orientation)
+            if self._ik.tracking_limited_elapsed > 0.5:
+                self.abort(f"joint tracking stalled in {phase}: error={self._ik.tracking_error:.3f}rad")
+                return self._hold_action()
             if not self._ik.ik_ok:
                 self._ik_failed_elapsed += self.physics_dt
                 if self._ik_failed_elapsed > 1.0:

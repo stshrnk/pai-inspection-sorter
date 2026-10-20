@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot name="ur_gripper">
   <joint name="ee_link_root_joint" type="fixed">
-    <origin xyz="-0. 0. -0.0000001" rpy="0. 0. -1.5707963"/>
+    <!-- Match the Isaac 6.0 UR10e sample's AssemblerFixedJoint localRot0:
+         quaternion (0.70710677, 0, 0, 0.70710677), wrist Z +90 degrees.
+         The copied URDF used -1.5707963, causing a pi-radian EE yaw error. -->
+    <origin xyz="-0. 0. -0.0000001" rpy="0. 0. 1.5707963"/>
     <parent link="wrist_3_link"/>
     <child link="ee_link_robotiq_arg2f_base_link"/>
   </joint>

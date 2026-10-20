@@ -118,6 +118,7 @@ def main():
         "format_version": 1, "architecture": "TinyInspectionCNN", "input_size": [64, 64],
         "labels": ["good", "defect"], "seed": args.seed, "device": args.device,
         "best_epoch": best_epoch, "temperature": temperature, "review_policy": review_policy,
+        "temperature_policy": "Validation NLL fit on T in [1, 10]; sharpening disabled to preserve review resolution.",
         "manifest_sha256": manifest_hash,
     }
     torch.save({**metadata, "state_dict": best_state}, args.out_dir / "classifier.pt")

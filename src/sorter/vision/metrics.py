@@ -11,9 +11,14 @@ def sigmoid(logits) -> np.ndarray:
 
 
 def choose_temperature(logits, targets) -> float:
+    """Validation NLL fit with T>=1: calibration may soften, never sharpen.
+
+    Small perfectly separable validation sets otherwise select T approaching
+    zero, saturating every score and destroying the low-confidence review band.
+    """
     logits = np.asarray(logits, dtype=np.float64)
     targets = np.asarray(targets, dtype=np.float64)
-    candidates = np.geomspace(0.1, 10.0, 81)
+    candidates = np.geomspace(1.0, 10.0, 41)
     losses = [np.mean(np.logaddexp(0, logits / t) - targets * logits / t) for t in candidates]
     return float(candidates[int(np.argmin(losses))])
 
