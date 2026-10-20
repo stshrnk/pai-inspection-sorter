@@ -6,6 +6,7 @@ silently relabelling the older tutorial's 2F-140 geometry as a 2F-85.
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 
 ASSET_SUFFIX_85 = '/Isaac/Robots_Multiphysics/UniversalRobots/ur10e/ur10e.usda'
@@ -39,7 +40,7 @@ def create_robot(world, asset_root: str, profile: str = 'robotiq85'):
     stage = get_current_stage()
     if stage.GetPrimAtPath(ROBOT_PRIM).IsValid():
         raise RuntimeError('Robot prim already exists; create the profile in an empty scene')
-    robot_prim = add_reference_to_stage(asset_root.rstrip('/') + ASSET_SUFFIX_85, ROBOT_PRIM)
+    robot_prim = add_reference_to_stage(os.environ.get('ROBOT_USD',asset_root.rstrip('/') + ASSET_SUFFIX_85), ROBOT_PRIM)
 
     def select_variant(prim, name, value):
         variants = prim.GetVariantSet(name)

@@ -1,0 +1,50 @@
+@page {
+  size: A4;
+  margin: 13mm 14mm 16mm;
+  @bottom-left { content: "AI外観検査・仕分けセル / 匿名draft"; font-size: 8pt; color: #52606c; }
+  @bottom-right { content: counter(page) " / " counter(pages); font-size: 8pt; color: #52606c; }
+}
+* { box-sizing: border-box; }
+html { font-family: sans-serif; color: #172633; background: #fff; font-size: 9.2pt; line-height: 1.62; }
+body { margin: 0; }
+.page { break-after: page; }
+.page:last-of-type { break-after: auto; }
+.page:last-of-type { font-size: 8.8pt; line-height: 1.5; }
+.page:last-of-type p { margin-bottom: 2mm; }
+h1 { font-size: 21pt; line-height: 1.28; margin: 0 0 5mm; font-weight: 700; color: #123f55; }
+h2 { font-size: 11.5pt; line-height: 1.4; margin: 4mm 0 1.8mm; color: #123f55; }
+p { margin: 0 0 3mm; }
+strong { font-weight: 700; }
+a { color: #155a78; text-decoration: none; overflow-wrap: anywhere; }
+.kicker { color: #56727e; font-size: 8.5pt; font-weight: 600; letter-spacing: .03em; margin-bottom: 2mm; }
+.lead { font-size: 12pt; margin-bottom: 5mm; }
+.pipeline { padding: 3mm; margin: 3mm 0 5mm; background: #edf5f8; border-left: 1.2mm solid #267c91; font-size: 10pt; }
+.columns { display: table; width: 100%; table-layout: fixed; }
+.columns > div { display: table-cell; vertical-align: top; }
+.columns > div:first-child { width: 65%; padding-right: 5mm; }
+.columns > div:last-child { width: 35%; }
+table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.4pt; line-height: 1.45; }
+th, td { text-align: left; padding: 1.8mm 2mm; border-bottom: .2mm solid #d9e2e7; vertical-align: top; overflow-wrap: anywhere; }
+th { color: #154459; background: #edf3f6; font-weight: 700; }
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+table.compact { width: 66%; }
+figure { margin: 3mm 0 4mm; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; height: auto; object-fit: contain; }
+figure.samples img { max-height: 115mm; }
+figure.chart img { max-height: 64mm; }
+figure.overview img { max-height: 68mm; }
+figcaption { font-size: 7.8pt; line-height: 1.4; color: #526671; margin-top: 1mm; text-align: left; }
+.small { font-size: 8.1pt; color: #435a68; line-height: 1.55; }
+.notice { border-left: 1mm solid #c17e2d; background: #fff6e9; padding: 2.5mm 3mm; font-size: 9pt; }
+.missing-figure { padding: 4mm; margin: 3mm 0; background: #f1f4f6; color: #60727c; font-size: 8.5pt; }
+ul { padding-left: 5mm; margin: 1mm 0 3mm; }
+li { margin: 1mm 0; }
+.draft { border-top: .2mm solid #d9e2e7; padding-top: 2mm; }
+.build-note { position: fixed; bottom: -11mm; left: 0; font-size: 6pt; color: #6d7c83; }
+@media screen {
+  html { background: #e8edf0; }
+  body { max-width: 210mm; margin: 8mm auto; background: #fff; padding: 13mm 14mm; }
+  .page { border-bottom: 1px solid #d9e2e7; padding-bottom: 8mm; margin-bottom: 8mm; }
+  .build-note { position: static; }
+}
