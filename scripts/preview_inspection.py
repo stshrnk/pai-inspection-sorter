@@ -36,6 +36,8 @@ def read_conditions(path: Path) -> list[dict]:
     for row in rows:
         if not isinstance(row, dict) or row.get('truth') not in ('good', 'defect'):
             raise ValueError('Each condition needs good/defect truth for appearance generation')
+        if 'note' in row and not isinstance(row['note'], str):
+            raise ValueError('Optional condition note must be text')
         condition = row.get('condition')
         if not isinstance(condition, dict):
             raise ValueError('Each row needs an appearance condition dictionary')
