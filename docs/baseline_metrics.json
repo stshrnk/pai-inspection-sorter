@@ -1,0 +1,36 @@
+{
+  "config": {
+    "mode": "IK+LERP",
+    "perception": false,
+    "lerp_speed": 0.07,
+    "events_dt": null,
+    "warmup_frames": 60,
+    "label": ""
+  },
+  "summary": {
+    "cycles": 2,
+    "success": 0,
+    "success_rate": 0.0,
+    "avg_cycle_time": 16.482409238815308,
+    "avg_vel_rms": 0.331302803543571,
+    "max_vel": 8.411014556884766
+  },
+  "cycles": [
+    {
+      "cube": "cube",
+      "success": false,
+      "cycle_time": 16.026299715042114,
+      "dist": 0.8077110278976367,
+      "vel_rms": 0.44100973177449515,
+      "vel_max": 8.411014556884766
+    },
+    {
+      "cube": "red_cube",
+      "success": false,
+      "cycle_time": 16.9385187625885,
+      "dist": 0.9519862397606103,
+      "vel_rms": 0.2215958753126469,
+      "vel_max": 4.032416343688965
+    }
+  ]
+}

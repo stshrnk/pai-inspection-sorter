@@ -1,0 +1,3023 @@
+{
+  "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+  "config": {
+    "controller": "fixed-cell IK feedback",
+    "motion_only": null,
+    "robot_profile": "robotiq85",
+    "physics_dt": 0.005,
+    "ee_offset": 0.13,
+    "joint_speed": 0.9,
+    "sequence": [
+      "good",
+      "defect"
+    ],
+    "trials_requested": 20,
+    "stop_on_failure": false,
+    "renderer": "RaytracedLighting",
+    "anti_aliasing": 0,
+    "record_every": 10,
+    "record_fps": 20.0,
+    "render_every": 20,
+    "record_trials": 3,
+    "model_sha256": "55b1afdb12c2aabbb44d553ff30b16e8158f48775544914b1761fc60ce9f4a58",
+    "part_mass_kg": 0.2
+  },
+  "cycles": [
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 1,
+      "image": "inspection_000.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.5349437354689335e-05,
+        "confidence": 0.9999846505626453,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 70.17570759699447,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.5349437354689335e-05,
+      "confidence": 0.9999846505626453,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 11.0,
+        "max": 101.0,
+        "range": 90.0,
+        "std": 27.669708240517316,
+        "spatial_std_max": 27.959055193883433,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 2,
+      "image": "inspection_001.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999165513219664,
+        "confidence": 0.9999165513219664,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 70.87061164097395,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999165513219664,
+      "confidence": 0.9999165513219664,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 99.0,
+        "range": 93.0,
+        "std": 27.118367928835823,
+        "spatial_std_max": 27.28488109762697,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 3,
+      "image": "inspection_002.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.9982815916329446,
+        "confidence": 0.9982815916329446,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 94.66600766900228,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.9982815916329446,
+      "confidence": 0.9982815916329446,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 5.0,
+        "max": 137.0,
+        "range": 132.0,
+        "std": 39.94844602893176,
+        "spatial_std_max": 39.86460903767832,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 4,
+      "image": "inspection_003.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.528356111201812e-05,
+        "confidence": 0.999984716438888,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.315946949995123,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.528356111201812e-05,
+      "confidence": 0.999984716438888,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 11.0,
+        "max": 100.0,
+        "range": 89.0,
+        "std": 27.698589636686226,
+        "spatial_std_max": 28.001637796437585,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 5,
+      "image": "inspection_004.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999130866113611,
+        "confidence": 0.9999130866113611,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 24.66872322000563,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999130866113611,
+      "confidence": 0.9999130866113611,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 102.0,
+        "range": 96.0,
+        "std": 27.178060855207356,
+        "spatial_std_max": 27.356188073442958,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 6,
+      "image": "inspection_005.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.9986093838379846,
+        "confidence": 0.9986093838379846,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 21.602492483973037,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.9986093838379846,
+      "confidence": 0.9986093838379846,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 4.0,
+        "max": 139.0,
+        "range": 135.0,
+        "std": 39.911548566850136,
+        "spatial_std_max": 39.83684119528357,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 7,
+      "image": "inspection_006.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.411877899065437e-05,
+        "confidence": 0.9999858812210094,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.29723909695167,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.411877899065437e-05,
+      "confidence": 0.9999858812210094,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 10.0,
+        "max": 100.0,
+        "range": 90.0,
+        "std": 27.731030639199915,
+        "spatial_std_max": 28.02748594855708,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 8,
+      "image": "inspection_007.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999335581999569,
+        "confidence": 0.9999335581999569,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 24.641378197004087,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999335581999569,
+      "confidence": 0.9999335581999569,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 5.0,
+        "max": 100.0,
+        "range": 95.0,
+        "std": 27.180691170378342,
+        "spatial_std_max": 27.350140497623894,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 9,
+      "image": "inspection_008.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.9985970388036112,
+        "confidence": 0.9985970388036112,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 21.68082973995479,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.9985970388036112,
+      "confidence": 0.9985970388036112,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 5.0,
+        "max": 137.0,
+        "range": 132.0,
+        "std": 39.991402599746294,
+        "spatial_std_max": 39.91835900723876,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 10,
+      "image": "inspection_009.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.2912740173966322e-05,
+        "confidence": 0.999987087259826,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.57089218701003,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.2912740173966322e-05,
+      "confidence": 0.999987087259826,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 11.0,
+        "max": 100.0,
+        "range": 89.0,
+        "std": 27.70101057408135,
+        "spatial_std_max": 27.998256655092135,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 11,
+      "image": "inspection_010.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999286353816634,
+        "confidence": 0.9999286353816634,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 25.531793908041436,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999286353816634,
+      "confidence": 0.9999286353816634,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 101.0,
+        "range": 95.0,
+        "std": 27.205700827493434,
+        "spatial_std_max": 27.38589033732236,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 12,
+      "image": "inspection_011.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.997934223181339,
+        "confidence": 0.997934223181339,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 21.81257170700701,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.997934223181339,
+      "confidence": 0.997934223181339,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 5.0,
+        "max": 136.0,
+        "range": 131.0,
+        "std": 39.98915433386278,
+        "spatial_std_max": 39.919999441929924,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 13,
+      "image": "inspection_012.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.651035841799585e-05,
+        "confidence": 0.999983489641582,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.302727530011907,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.651035841799585e-05,
+      "confidence": 0.999983489641582,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 10.0,
+        "max": 100.0,
+        "range": 90.0,
+        "std": 27.768337769858967,
+        "spatial_std_max": 28.062157778048185,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 14,
+      "image": "inspection_013.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.99992964684247,
+        "confidence": 0.99992964684247,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 26.19968699698802,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.99992964684247,
+      "confidence": 0.99992964684247,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 100.0,
+        "range": 94.0,
+        "std": 27.148039604784522,
+        "spatial_std_max": 27.31434576613435,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 15,
+      "image": "inspection_014.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.9986715222465821,
+        "confidence": 0.9986715222465821,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 21.6467246490065,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.9986715222465821,
+      "confidence": 0.9986715222465821,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 4.0,
+        "max": 140.0,
+        "range": 136.0,
+        "std": 39.88214635313142,
+        "spatial_std_max": 39.81437869100219,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 16,
+      "image": "inspection_015.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.2623705086590575e-05,
+        "confidence": 0.9999873762949134,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.405208333977498,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.2623705086590575e-05,
+      "confidence": 0.9999873762949134,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 11.0,
+        "max": 100.0,
+        "range": 89.0,
+        "std": 27.77782407671402,
+        "spatial_std_max": 28.06598266793238,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 17,
+      "image": "inspection_016.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999165412151746,
+        "confidence": 0.9999165412151746,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 24.725541680003516,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999165412151746,
+      "confidence": 0.9999165412151746,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 98.0,
+        "range": 92.0,
+        "std": 27.163725347206032,
+        "spatial_std_max": 27.32151627717775,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 18,
+      "image": "inspection_017.png",
+      "truth": "defect",
+      "destination": "review",
+      "decision": {
+        "label": "review",
+        "defect_score": 0.99888308863311,
+        "confidence": 0.99888308863311,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": true,
+      "max_part_z": 0.28471502661705017,
+      "cycle_time": 21.846935278037563,
+      "simulation_seconds": 31.269999301061034,
+      "motion_simulation_seconds": 29.76999999999836,
+      "final_position": [
+        0.4000037908554077,
+        0.2195127308368683,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "review",
+        "aabb_min": [
+          0.3499768298796907,
+          0.19371033780820396,
+          0.014999936502605758
+        ],
+        "aabb_max": [
+          0.45003075183112473,
+          0.2453151238655326,
+          0.07499999256786696
+        ],
+        "linear_speed": 0.00036920567809807617,
+        "angular_speed": 0.006024257999455612,
+        "floor_offset": -6.349739424191259e-08,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 6114
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 2.864999999999961,
+          "position_error_m": 0.0008323741049782797,
+          "orientation_error_rad": 0.002281237450968141,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 2.7489911267314793
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0008011321284020633,
+          "orientation_error_rad": 0.0030188195980785405,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.992367259577639
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0007365916580950251,
+          "orientation_error_rad": 0.003169689662108994,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.0009726413601258351,
+          "orientation_error_rad": 0.0002216246674765143,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.992097574941982
+        }
+      ],
+      "defect_score": 0.99888308863311,
+      "confidence": 0.99888308863311,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 5.0,
+        "max": 136.0,
+        "range": 131.0,
+        "std": 39.9712621710358,
+        "spatial_std_max": 39.913277551762576,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 19,
+      "image": "inspection_018.png",
+      "truth": "good",
+      "destination": "good",
+      "decision": {
+        "label": "good",
+        "defect_score": 1.4249759822331725e-05,
+        "confidence": 0.9999857502401777,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.284574031829834,
+      "cycle_time": 24.28648060798878,
+      "simulation_seconds": 35.189999213442206,
+      "motion_simulation_seconds": 33.68999999999878,
+      "final_position": [
+        -0.39926472306251526,
+        0.549564003944397,
+        0.04499996453523636
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "good",
+        "aabb_min": [
+          -0.44930762247308054,
+          0.5237306025457755,
+          0.014999937038358401
+        ],
+        "aabb_max": [
+          -0.34922182365195,
+          0.5753974053430184,
+          0.07499999203211431
+        ],
+        "linear_speed": 0.0003653830313241187,
+        "angular_speed": 0.006007923816426662,
+        "floor_offset": -6.296164159827478e-08,
+        "settled_steps": 784,
+        "required_steps": 60,
+        "samples": 6898
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 6.784999999999878,
+          "position_error_m": 0.0009407276785180273,
+          "orientation_error_rad": 0.0007202354870427136,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 6.666740758549575
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.104999999999892,
+          "position_error_m": 0.00044760358076718925,
+          "orientation_error_rad": 0.002739567229841714,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.985884201019056
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.00038672399366954254,
+          "orientation_error_rad": 0.003202172097665197,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010193794109386314,
+          "orientation_error_rad": 0.0007536920873795251,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9989179982191176
+        }
+      ],
+      "defect_score": 1.4249759822331725e-05,
+      "confidence": 0.9999857502401777,
+      "settled_steps": 784,
+      "image_quality": {
+        "min": 11.0,
+        "max": 100.0,
+        "range": 89.0,
+        "std": 27.653657495636878,
+        "spatial_std_max": 27.947122246631604,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    },
+    {
+      "run_id": "46ae1c233b0444aeb52f9874a78cc95a",
+      "trial": 20,
+      "image": "inspection_019.png",
+      "truth": "defect",
+      "destination": "defect",
+      "decision": {
+        "label": "defect",
+        "defect_score": 0.9999256342098152,
+        "confidence": 0.9999256342098152,
+        "review_threshold": 0.9996913274226139,
+        "method": "cnn"
+      },
+      "success": true,
+      "transfer_success": true,
+      "correct_route": true,
+      "review": false,
+      "max_part_z": 0.28470730781555176,
+      "cycle_time": 24.708645487960894,
+      "simulation_seconds": 35.73499920126051,
+      "motion_simulation_seconds": 34.23499999999906,
+      "final_position": [
+        -0.399177223443985,
+        0.21951426565647125,
+        0.04500001668930054
+      ],
+      "placement": {
+        "success": true,
+        "eligible": true,
+        "contained": true,
+        "on_floor": true,
+        "stationary": true,
+        "released": true,
+        "gripper_clear": true,
+        "reason": "placed_and_settled",
+        "tray": "defect",
+        "aabb_min": [
+          -0.449203940215373,
+          0.19371224355434807,
+          0.014999874166259114
+        ],
+        "aabb_max": [
+          -0.34915050667259695,
+          0.24531628775859443,
+          0.07500015921234196
+        ],
+        "linear_speed": 0.000397603932405674,
+        "angular_speed": 0.0059884451067132955,
+        "floor_offset": -1.2583374088548371e-07,
+        "settled_steps": 783,
+        "required_steps": 60,
+        "samples": 7007
+      },
+      "phases": [
+        {
+          "phase": "approach",
+          "simulation_seconds": 3.7349999999999426,
+          "position_error_m": 0.0009075869743490566,
+          "orientation_error_rad": 0.0015546970544683821,
+          "cartesian_speed_m_s": 0.15,
+          "path_duration_s": 3.6193572865978583
+        },
+        {
+          "phase": "descend",
+          "simulation_seconds": 6.114999999999892,
+          "position_error_m": 0.0003739727372015401,
+          "orientation_error_rad": 0.0025381294073968386,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.998261954379689
+        },
+        {
+          "phase": "close",
+          "simulation_seconds": 2.1099999999999772,
+          "position_error_m": 0.00035140090125639734,
+          "orientation_error_rad": 0.002721994737212874,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "lift",
+          "simulation_seconds": 3.114999999999956,
+          "position_error_m": 0.0010460972666737553,
+          "orientation_error_rad": 0.0007262318963383194,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.997318728140326
+        },
+        {
+          "phase": "transport",
+          "simulation_seconds": 7.329999999999866,
+          "position_error_m": 0.00091148226377805,
+          "orientation_error_rad": 0.002066694696701332,
+          "cartesian_speed_m_s": 0.12,
+          "path_duration_s": 7.2112625765592595
+        },
+        {
+          "phase": "lower",
+          "simulation_seconds": 6.109999999999892,
+          "position_error_m": 0.0007257358988389614,
+          "orientation_error_rad": 0.0020996831264203206,
+          "cartesian_speed_m_s": 0.04,
+          "path_duration_s": 5.991565005047224
+        },
+        {
+          "phase": "open",
+          "simulation_seconds": 2.6099999999999666,
+          "position_error_m": 0.0006715970321179672,
+          "orientation_error_rad": 0.002370126488493268,
+          "cartesian_speed_m_s": null,
+          "path_duration_s": 0.0
+        },
+        {
+          "phase": "retreat",
+          "simulation_seconds": 3.109999999999956,
+          "position_error_m": 0.000996457617881216,
+          "orientation_error_rad": 0.0005749135141601991,
+          "cartesian_speed_m_s": 0.08,
+          "path_duration_s": 2.9930676561694916
+        }
+      ],
+      "defect_score": 0.9999256342098152,
+      "confidence": 0.9999256342098152,
+      "settled_steps": 783,
+      "image_quality": {
+        "min": 6.0,
+        "max": 99.0,
+        "range": 93.0,
+        "std": 27.15847344414325,
+        "spatial_std_max": 27.33487893486722,
+        "shape": [
+          192,
+          192,
+          3
+        ]
+      },
+      "failure_reason": "",
+      "reason": "placed_and_settled",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      }
+    }
+  ],
+  "appearance_plan": [
+    {
+      "truth": "good",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      },
+      "note": "valの images/val/condition-107_good.png の生成条件。全3ケースともvalから3経路確認用に選定したデモ条件であり、分類benchmark集計には含めない。実再撮影の行先は固定せず画像だけで判定する。"
+    },
+    {
+      "truth": "defect",
+      "condition": {
+        "gray": 0.7635404665148318,
+        "dome": 92.83828204455831,
+        "key": 61.969744975360484,
+        "patch_x": -0.013006515848417114,
+        "patch_y": 0.004872007302153038,
+        "patch_w": 0.0146479226482945,
+        "patch_h": 0.024688369505609195,
+        "patch_gray": 0.0759145318480169
+      },
+      "note": "valの images/val/condition-107_defect.png の生成条件。全3ケースともvalから3経路確認用に選定したデモ条件であり、分類benchmark集計には含めない。実再撮影の行先は固定せず画像だけで判定する。"
+    },
+    {
+      "truth": "defect",
+      "condition": {
+        "gray": 0.7243882548233185,
+        "dome": 42.57914983869269,
+        "key": 247.1385484823818,
+        "patch_x": -0.0166911651524778,
+        "patch_y": 0.007922441648472606,
+        "patch_w": 0.01681107807819466,
+        "patch_h": 0.013968097167269666,
+        "patch_gray": 0.1392746023691742
+      },
+      "note": "valの images/val/condition-119_defect.png の生成条件。val最小確信度の保存画像では不良score=0.996435383037, confidence=0.996435383037, label=review。全3ケースともvalから3経路確認用に選定したデモ条件であり、分類benchmark集計には含めない。実再撮影の行先は固定せず画像だけで判定する。"
+    }
+  ],
+  "status": "completed",
+  "summary": {
+    "cycles": 20,
+    "success": 20,
+    "success_rate": 1.0,
+    "transfer_success": 20,
+    "review": 6,
+    "ai_decisions": 20,
+    "accepted_decisions": 14,
+    "classification_coverage": 0.7,
+    "accepted_route_accuracy": 1.0
+  }
+}
