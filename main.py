@@ -244,6 +244,16 @@ def main():
                 destination = decision['label']
                 if destination not in TRAYS:
                     raise ValueError('classifier returned an invalid destination')
+                if classifier is not None and not all(
+                    isinstance(decision.get(key), (float, int))
+                    and math.isfinite(decision[key]) and 0 <= decision[key] <= 1
+                    for key in ('defect_score', 'confidence')
+                ):
+                    # Invalid model output must not leak NaN into the metrics
+                    # and prevent even the failure row from being saved.
+                    record.update(defect_score=None, confidence=None,
+                                  decision={'method': 'cnn', 'error': 'invalid_scores'})
+                    raise ValueError('classifier returned invalid scores')
                 record['review'] = destination == 'review'
                 print(f'[inspection] trial={trial + 1} destination={destination} score={decision.get("defect_score")}')
                 center = TRAYS[destination]
@@ -265,6 +275,8 @@ def main():
                     robot.get_articulation_controller().apply_action(action)
                     step()
                     pos, quat = part.get_world_pose()
+                    if not np.isfinite(pos).all() or not np.isfinite(quat).all():
+                        raise RuntimeError('non-finite workpiece pose')
                     max_height = float(pos[2]) if max_height is None else max(max_height, float(pos[2]))
                     if control.phase == 'transport' and phase != 'transport' and float(pos[2]) <= float(SOURCE[2]) + .06:
                         control.abort('workpiece not lifted')
@@ -311,6 +323,9 @@ def main():
                 if control is not None:
                     control.abort(reason)
                 print(f'[error] {reason}', file=sys.stderr)
+                if os.environ.get('SORTER_DEBUG') == '1':
+                    import traceback
+                    traceback.print_exc()
             record['cycle_time'] = time.monotonic() - start
             record['simulation_seconds'] = max(0., float(world.current_time - simulation_start))
             record['max_part_z'] = max_height
@@ -344,6 +359,9 @@ def main():
     except BaseException as error:
         reason = _safe_error(stage, error)
         print(f'[error] {reason}', file=sys.stderr)
+        if os.environ.get('SORTER_DEBUG') == '1':
+            import traceback
+            traceback.print_exc()
         try:
             persist('error', reason)
         except Exception:

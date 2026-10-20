@@ -1,6 +1,8 @@
 # AI外観検査・仕分けセル
 
-Physical AI 応用1講座の最終課題。Isaac Sim 上の UR10e + Robotiq 2F-85 で直方体部品を撮影し、小型 CNN が上面の模擬汚れを判定して「良品 / 不良品 / 要確認」のトレイに運び分ける。
+Physical AI 応用1講座の最終課題。Isaac Sim 上の UR10e + Robotiq 系平行グリッパーで直方体部品を撮影し、小型 CNN が上面の模擬汚れを判定して「良品 / 不良品 / 要確認」のトレイに運び分ける。
+
+計画では Robotiq 2F-85 を想定しているが、現在参照する NVIDIA の `ur_gripper.usd` と運動学用 URDF には **2F-140 由来のメッシュ名** が含まれる。2F-85 と同一の寸法・開口・把持挙動であることは未確認であり、本実装を2F-85の再現とは断定しない。
 
 供給位置と姿勢は固定し、部品を1個ずつ検査する。部品の供給装置や実機への接続は対象外。分類器への入力は RGB 画像だけで、シミュレータの正解ラベル・物体名・搬送先を特徴に使わない。
 
@@ -29,7 +31,7 @@ tests/                         分離漏れ・判定・搬送測定の検証
 
 ## セットアップ
 
-検証環境は NVIDIA DGX Spark / GB10、Linux aarch64、Isaac Sim **6.0.0-rc.22**。Isaac Sim 付属の Python・PyTorch・NumPy・Pillow を利用する。ROS 2、scikit-learn、外部 AI API は不要。
+検証環境は NVIDIA DGX Spark / GB10、Linux aarch64、Isaac Sim **6.0.0-rc.22**。Isaac Sim 付属の Python・PyTorch・NumPy・Pillow を利用する。ROS 2、scikit-learn、外部 AI API は不要。学習は標準で **ローカル CPU の PyTorch** を使い、有料の外部学習サービスや API 呼び出しによる費用は発生しない構成。GPU 学習が必要な場合のみ `train_classifier.py --device cuda` を選択する。
 
 Isaac Sim を別途用意してから、リポジトリのルートで実行する。インストール場所は環境変数で指定できる。
 
@@ -54,14 +56,14 @@ export ROBOT_USD=/path/to/ur_gripper.usd
 
 ```bash
 SORTER_ENTRYPOINT=scripts/generate_dataset.py ./run.sh --headless \
-  --out-dir data/inspection --groups 150 --seed 42
+  --out-dir data/inspection-v1 --groups 150 --seed 42
 
 ./run_python.sh scripts/train_classifier.py \
-  --manifest data/inspection/manifest.json \
+  --manifest data/inspection-v1/manifest.json \
   --out-dir models/inspection --epochs 100 --seed 42
 
 ./run_python.sh scripts/evaluate_classifier.py \
-  --manifest data/inspection/manifest.json \
+  --manifest data/inspection-v1/manifest.json \
   --model-dir models/inspection --out artifacts/test_evaluation.json
 ```
 
@@ -73,7 +75,7 @@ CNN は 64×64 RGB を入力とする3層の小型畳み込みモデルで、学
 
 主な出力:
 
-- `data/inspection/manifest.json`: 条件・ラベル・split と相対画像パス。
+- `data/inspection-v1/manifest.json`: 条件・ラベル・split と相対画像パス。
 - `models/inspection/classifier.pt`: CNN の重み・前処理・校正値・判定しきい値。
 - `models/inspection/brightness.json`: 明度方式の設定。
 - `models/inspection/training.json`: 学習履歴と val 評価。test は含まない。
@@ -116,12 +118,16 @@ CNN は 64×64 RGB を入力とする3層の小型畳み込みモデルで、学
 
 検査画像、不良スコア、信頼度、行先、搬送結果・失敗理由を出力先へ保存する。`metrics.json` が試行全体、`inspections.csv` / `inspections.jsonl` が検査ログ。CSV と JSONL は試行ごとに追記し、途中で停止しても確定済みの結果を残す。`METRICS_OUT` で metrics JSON の保存先を上書きできる。物理搬送の成功と、正解ラベルに対する仕分けの正しさは別に確認し、要確認に運んだ件数も併記する。
 
+既存の検査ログ・metrics・検査画像がある出力先と、既存フレームがある録画先は再利用を拒否する。再実行には新しいディレクトリを指定する。起動・撮影・分類のエラーでも `status=error` と簡潔な停止理由を metrics に残し、終了コードを非0にする。試行中の撮影・分類エラーは失敗行も保存する。検査画像の range / std を保存し、完全に一様な画像は失敗として停止する。
+
 ```bash
 python3 scripts/summarize_runs.py 'artifacts/motion_*/metrics.json' \
   --out artifacts/motion_summary.json
 ```
 
 同一試行の metrics と JSONL を二重に入力しない。未確定・不明の結果は実測成功率の分母から分けて報告する。旧 `scripts/baseline.py` の距離中心の成功判定と、新セルの厳密な成功判定も混ぜない。
+
+`summary.success_rate` は要確認への搬送も含むセル処理の成功率。良否分類の正解率は独立 test 評価を使い、運転時は `classification_coverage`、`accepted_route_accuracy`、`review` 件数を合わせて読む。`cycle_time` は実際の処理経過秒、`simulation_seconds` は供給から静止判定までのシミュレーション時間、`motion_simulation_seconds` はロボット制御区間の時間。
 
 ## フレーム保存と試し動画
 
@@ -146,3 +152,11 @@ python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 2
 分類器の評価対象はシミュレーションで生成した画像。実カメラ・実部品への汎化性能は未評価。固定位置・固定姿勢・既知寸法で制御するため、未知姿勢の検出や供給装置の自動化は含まない。把持の失敗、到達不能、カメラ画像取得失敗、タイムアウトは成功に数えず、停止理由を残して調整する。
 
 実測で未完の部分は [docs/RESULTS.md](docs/RESULTS.md) に記載する。結果や動画を公開する前に、生成物・ログ・画面内の文字に個人情報、認証情報、業務データが含まれないことを確認する。
+
+## 流用範囲とアセットの出典
+
+既存の Isaac Sim 搬送実験から、`planning/` の IK・把持搬送制御、`tasks/`、`perception/` の必要なコードをコピーしている。元の実験リポジトリへの実行時依存はない。今回の課題用に部品・汚れ・検査用シーン、小型 CNN と明度比較、条件分離、判定接続、厳密な成功測定、検査ログ・録画を追加した。現在の `fixed_cell_controller.py` はコピーした IK 実装を基に、関節インデックス処理、収束確認、段階ごとの停止判定を組み立てている。
+
+`src/sorter/planning/rmpflow/ur10e.urdf`、`robot_descriptor.yaml`、`ur10e_rmpflow_common.yaml` は NVIDIA Isaac Sim の UR10e サンプルに由来する運動学定義・設定。YAML 内の NVIDIA 著作権表示・Apache-2.0 のヘッダーを保持している。利用・再配布条件は各ファイルおよび取得元の条件を確認する。
+
+表示・接触計算用のロボットは NVIDIA Isaac Sim 6.0 アセットの `Isaac/Samples/Rigging/Manipulator/configure_manipulator/ur10e/ur/ur_gripper.usd` を実行時に参照する。USD 本体・メッシュ・テクスチャ・Isaac Sim 本体はリポジトリへ同梱しない。URDF に記載されたメッシュ名は元アセット由来の参照であり、同名メッシュのコピーは含めない。アセット利用条件は NVIDIA の配布条件に従う。

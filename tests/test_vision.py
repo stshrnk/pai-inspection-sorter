@@ -1,6 +1,7 @@
 """Meaningful guards against condition leakage and unsafe confidence routing."""
 
 import json
+import importlib.util
 from pathlib import Path
 import sys
 import tempfile
@@ -86,6 +87,23 @@ class VisionTests(unittest.TestCase):
             result = classifier.predict(np.full((64, 64, 3), 30, dtype=np.uint8))
         self.assertEqual(result["label"], "defect")
         self.assertGreater(result["defect_score"], 0.9)
+
+    @unittest.skipUnless(importlib.util.find_spec("torch"), "CNN inference requires Isaac's torch runtime")
+    def test_cnn_checkpoint_loads_and_routes_uncertain_image(self):
+        import torch
+        from sorter.vision.model import TinyInspectionCNN
+
+        model = TinyInspectionCNN()
+        for parameter in model.parameters():
+            parameter.data.zero_()
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as directory:
+            path = Path(directory) / "classifier.pt"
+            torch.save({"state_dict": model.state_dict(), "temperature": 1.0,
+                        "review_policy": {"threshold": 0.8}}, path)
+            classifier = SorterClassifier(path)
+            result = classifier.predict(np.full((64, 64, 3), 128, dtype=np.uint8))
+        self.assertEqual(result["label"], "review")
+        self.assertEqual(result["confidence"], 0.5)
 
     def test_brightness_fits_darker_defects(self):
         features, targets = [0.8, 0.9, 0.1, 0.2], [0, 0, 1, 1]
