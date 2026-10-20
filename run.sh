@@ -1,11 +1,13 @@
-#!/bin/bash
-export DISPLAY=:0
-export XAUTHORITY=/run/user/1000/gdm/Xauthority
-ISAAC_PYTHON=~/dev/IsaacSim/_build/linux-aarch64/release/python.sh
-
-# Ensure CUDA 12.9 NVRTC builtins are findable for GB10 (sm_121) support
-TORCH_LIB=~/dev/IsaacSim/_build/linux-aarch64/release/exts/omni.isaac.ml_archive/pip_prebundle/torch/lib
-export LD_LIBRARY_PATH="$TORCH_LIB:${LD_LIBRARY_PATH:-}"
-
+#!/usr/bin/env bash
+set -euo pipefail
 cd "$(dirname "$0")"
-exec "$ISAAC_PYTHON" main.py "$@"
+ISAAC_ROOT="${ISAAC_ROOT:-$HOME/dev/IsaacSim/_build/linux-aarch64/release}"
+ISAAC_PYTHON="${ISAAC_PYTHON:-$ISAAC_ROOT/python.sh}"
+if [[ ! -x "$ISAAC_PYTHON" ]]; then
+    echo 'Set ISAAC_ROOT or ISAAC_PYTHON to an Isaac Sim installation.' >&2
+    exit 2
+fi
+# GB10 requires the NVRTC libraries shipped with Isaac Sim's torch.
+TORCH_LIB="$ISAAC_ROOT/exts/omni.isaac.ml_archive/pip_prebundle/torch/lib"
+export LD_LIBRARY_PATH="$TORCH_LIB:${LD_LIBRARY_PATH:-}"
+exec "$ISAAC_PYTHON" "${SORTER_ENTRYPOINT:-main.py}" "$@"

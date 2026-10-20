@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+artifacts/
+data/
+models/
+recordings/
+*.pt
+*.pth
+*.mp4
+.env
+*.pem
+*.key
