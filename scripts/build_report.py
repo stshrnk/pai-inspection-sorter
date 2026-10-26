@@ -149,7 +149,7 @@ def render_report(c, t):
 <p class="small">NVIDIA Isaac SimのUR10eサンプルに由来するロボット設定・搬送制御を利用・変更した。出典：<a href="https://github.com/isaac-sim/IsaacSim/tree/main/source/standalone_examples/api/isaacsim.robot.manipulators/ur10e">NVIDIA Isaac Sim UR10eサンプル</a>。対象コードのライセンスはApache-2.0。著作権・ライセンス表示を保持し、詳細な流用範囲と変更点をTHIRD_PARTY_NOTICES.md、ライセンス本文をLICENSES/Apache-2.0.txtに記載した。</p>
 <p class="small">今回追加したのは、検査シーン、画像生成と条件分離、小型CNN、輝度比較、要確認への振り分け、厳密な搬送計測、検査ログ・録画。Isaac Sim本体、ロボットの形状・メッシュなどのアセットは同梱せず実行時に参照する。これらのアセットの利用条件は、コードのApache-2.0とは別にNVIDIAの配布条件に従う。</p>
 <p class="small">測定根拠：docs/classification_metrics.json、docs/transport_metrics.json。実験の詳細：docs/CLASSIFICATION.md、docs/RESULTS.md。測定日：{esc(c['measured_date'])}。</p>
-<div class="links"><b>提出先リンク</b><br>GitHub URL：（提出時に記入）<br>動画 URL：（提出時に記入）<br>動画タイトル：PAI最終課題_142245</div>
+<div class="links"><b>提出先リンク</b><br>GitHub URL：https://github.com/stshrnk/pai-inspection-sorter<br>動画 URL：https://youtu.be/IFdMTc3qoIg<br>動画タイトル：PAI最終課題_142245</div>
 '''))
     return '\n'.join(parts)
 
