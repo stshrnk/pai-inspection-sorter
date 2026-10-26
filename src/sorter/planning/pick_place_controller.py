@@ -1,3 +1,7 @@
+# Portions derived from isaac-sim/IsaacSim standalone_examples/api/isaacsim.robot.manipulators/ur10e/controller/pick_place.py
+# SPDX-FileCopyrightText: Copyright (c) 2022-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Modified for this project. See THIRD_PARTY_NOTICES.md.
 """Pick and place controller for UR10e with Robotiq 2F-85 parallel gripper."""
 
 import os

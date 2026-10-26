@@ -1,3 +1,7 @@
+# Derived from isaac-sim/IsaacSim standalone_examples/api/isaacsim.robot.manipulators/ur10e/rmpflow/robot_descriptor.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2022-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Modified for this project. See THIRD_PARTY_NOTICES.md.
 # Arm-only kinematics for the NVIDIA UR10e + Robotiq_2F_85 assembled variant.
 # Six-axis ordering follows the existing NVIDIA-derived UR10e configuration.
 # No geometry, mesh, or collision avoidance model is bundled in this profile.

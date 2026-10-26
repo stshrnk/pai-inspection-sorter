@@ -189,15 +189,15 @@ python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 2
 
 既存の Isaac Sim 搬送実験から、`planning/` の IK・把持搬送制御、`tasks/`、`perception/` の必要なコードをコピーしている。元の実験リポジトリへの実行時依存はない。今回の課題用に部品・汚れ・検査用シーン、小型 CNN と明度比較、条件分離、判定接続、厳密な成功測定、検査ログ・録画を追加した。現在の `fixed_cell_controller.py` はコピーした IK 実装を基に、関節インデックス処理、収束確認、段階ごとの停止判定を組み立てている。
 
-`src/sorter/planning/rmpflow/ur10e.urdf`、`robot_descriptor.yaml`、`ur10e_rmpflow_common.yaml` は NVIDIA Isaac Sim の UR10e サンプルに由来する運動学定義・設定。YAML 内の NVIDIA 著作権表示・Apache-2.0 のヘッダーを保持している。85用の [profiles/ur10e_85](src/sorter/planning/profiles/ur10e_85/README.md) は既存arm6軸とrootの数値だけを再利用し、指・メッシュなしのIK専用URDFとdescriptorを用意した。利用・再配布条件は各ファイルおよび取得元の条件を確認する。
+`src/sorter/planning/rmpflow/ur10e.urdf`、`robot_descriptor.yaml`、`ur10e_rmpflow_common.yaml` は NVIDIA Isaac Sim の UR10e サンプルに由来する運動学定義・設定。YAML 内の NVIDIA 著作権表示・Apache-2.0 のヘッダーを保持している。85用の [profiles/ur10e_85](src/sorter/planning/profiles/ur10e_85/README.md) は既存arm6軸とrootの数値だけを再利用し、指・メッシュなしのIK専用URDFとdescriptorを用意した。流用元・ライセンス（Apache-2.0）・変更点の一覧は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照。
 
 85用armの局所変換・ゼロ姿勢FKとUSDとの最大成分誤差は1.47e-7、マウントは1.63e-7以下で、許容1e-6以内。`static_evidence.json` に参照URL・SHA256・比較値を保存した。実行時にも、USDの手先実姿勢とLula FKがログの表示精度で一致したことを確認している。この整合性確認は、物理搬送の成功確認とは分けて扱う。
 
 表示・接触計算用の標準ロボットは NVIDIA Isaac Sim 6.0 の `Isaac/Robots_Multiphysics/UniversalRobots/ur10e/ur10e.usda` を実行時に参照し、`Physics=physx` / `Gripper=Robotiq_2F_85` を選択する。比較用140だけは `Isaac/Samples/Rigging/Manipulator/configure_manipulator/ur10e/ur/ur_gripper.usd` を参照する。USD 本体・メッシュ・テクスチャ・Isaac Sim 本体はリポジトリへ同梱しない。旧URDFに記載されたメッシュ名も元アセット由来の参照であり、同名メッシュのコピーは含めない。アセット利用条件は NVIDIA の配布条件に従う。
 
-## 動作動画・匿名レポート
+## 提出用動画・レポート
 
-ローカルの `recordings/demo.mp4` は3経路のAI判定字幕を付けたデモ。動画だけ表示gammaを1.6に補正し、分類入力と元のPNG連番は変更しない。試行ごとの初期化を含む検証映像であり、連続供給機の映像ではない。
+提出用動画は `recordings/PAI最終課題_142245.mp4`。日本語の目的説明・処理フロー、AI入力の拡大画像付き3試行、評価結果、工夫と限界を約150秒にまとめた。搬送映像はシミュレーション時間に対して等速で、試行ごとの初期化を含む。全景のみ表示gammaを1.6に補正し、AI入力は64×64へ縮小後に無補正で拡大表示する。日本語字幕で説明し、音声は付けていない。元の `recordings/demo.mp4` とPNG連番は保持している。
 
 ![3経路デモの一場面](review/demo_frame.png)
 
@@ -209,10 +209,13 @@ python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 2
   --record-dir recordings/demo/frames --record-trials 3
 python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 \
   --fps 20 --metrics artifacts/evaluation20/metrics.json --trials 3 --gamma 1.6
+python3 scripts/make_video.py --submission
 python3 scripts/build_report.py
 ```
 
-レポートは `artifacts/report/inspection_report.html` と `.pdf` に出力する。PDF生成にはWeasyPrintが必要（検証環境の既存版68.1を使用）。`--html-only` なら標準PythonだけでHTMLを作れる。匿名の下書きであり、提出前に内容とファイル名を確認する。GitHub・YouTubeの公開やOmniCampus提出は自動実行しない。
+提出用レポートは `artifacts/report/説明資料_PAI最終課題_142245.pdf`（A4・6ページ）と同名のHTMLに出力する。PDF生成にはWeasyPrint、共通の図版生成にはPillowと日本語フォント（Noto Sans CJK）、動画生成にはffmpegとNumPyを使う。既存環境の `python3` で実行できる。`--html-only` でPDF生成を省略できる。動画の再生成には `--submission --overwrite` を指定する。新たなシミュレーション・学習・外部API呼び出しは行わない。
+
+図版と目視確認用の画像は `review/submission/`、動画の編集区間・試行ログ対応は `artifacts/submission_build/timeline.json` に保存する。動画とPDFは `docs/classification_metrics.json` と、同一内容であることを確認した公開用・元の搬送ログから生成する。GitHub・動画URLはPDF内の「（提出時に記入）」に記入する。GitHub・YouTubeの公開やOmniCampus提出は自動実行しない。
 
 実セルでの判定だけを確認する場合:
 
@@ -223,3 +226,7 @@ SORTER_ENTRYPOINT=scripts/preview_inspection.py ./run.sh --headless \
 ```
 
 この確認は搬送を実行せず、分類benchmarkの件数にも加えない。`SORTER_DEBUG=1` で実行時の例外詳細を端末ログへ出せる。録画対象はカメラ画像だけとする。
+
+## ライセンス
+
+[Apache License 2.0](LICENSE)。NVIDIA Isaac Sim のサンプルに由来するファイルの著作権表示と変更点は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) に記載。Isaac Sim 本体・NVIDIA アセットは同梱しておらず、NVIDIA の配布条件に従う。

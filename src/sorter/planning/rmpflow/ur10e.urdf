@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Derived from isaac-sim/IsaacSim standalone_examples/api/isaacsim.robot.manipulators/ur10e/rmpflow/ur10e.urdf
+     SPDX-FileCopyrightText: Copyright (c) 2022-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+     SPDX-License-Identifier: Apache-2.0
+     Modified: ee_link_root_joint rpy yaw changed from -1.5707963 to +1.5707963. See THIRD_PARTY_NOTICES.md. -->
 <robot name="ur_gripper">
   <joint name="ee_link_root_joint" type="fixed">
     <!-- Match the Isaac 6.0 UR10e sample's AssemblerFixedJoint localRot0:

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Derived from isaac-sim/IsaacSim standalone_examples/api/isaacsim.robot.manipulators/ur10e/rmpflow/ur10e.urdf
+     SPDX-FileCopyrightText: Copyright (c) 2022-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+     SPDX-License-Identifier: Apache-2.0
+     Modified: derived arm-only kinematics; visual/collision geometry removed. See THIRD_PARTY_NOTICES.md. -->
 <robot name="ur10e_robotiq85_kinematics">
   <!-- Arm kinematics reused from the existing NVIDIA-derived UR10e URDF; geometry deliberately omitted. -->
   <joint name="ur_root_joint" type="fixed">
