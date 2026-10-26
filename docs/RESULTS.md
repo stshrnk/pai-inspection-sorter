@@ -94,7 +94,9 @@
 - `recordings/e2e-first.mp4`: **66.9秒 / H.264 / 960×720 / 20 fps**。カメラだけを保存した最初の通し試験。
 - `recordings/demo.mp4`: **102.05秒 / H.264 / 960×720 / 20 fps**。最初の3試行（good / defect / review）のAI判定字幕付き。表示gamma=1.6のみ補正し、AI入力と元PNG連番は無補正。
 - `recordings/demo/frames/`: 20試行の最初の3試行の元PNG連番。
-- `artifacts/report/inspection_report.pdf`: 実測値を反映した匿名A4・4ページの提出資料下書き。
+- `recordings/PAI最終課題_142245.mp4`: 既存フレームを使った日本語解説付き提出用動画。AI入力画像・閾値との比較・独立test評価・固定条件での搬送評価と限界を表示する。
+- `artifacts/report/説明資料_PAI最終課題_142245.pdf`: 概要・目的・構成・工夫・分類/搬送結果・考察と出典を整理したA4・6ページの提出資料。
+- `review/submission/`: 提出用図版、PDF全ページと動画の目視確認画像。
 - `review/inspection_samples.png`: train/valから選んだ画像の確認用シート。
 - `review/classification_comparison.png`: 凍結モデルと輝度法の独立test比較。
 - `artifacts/logs/unit-tests-final.log`: Isaac同梱Pythonで **29件合格**。条件分離、画素のみの推論、制御の速度・停止、配置判定、ログ保存を検証。
@@ -104,5 +106,5 @@
 ## 残作業
 
 - 暗照明への汎化、レンダー残像の低減、未知条件・実機画像での再評価。
-- 本番の説明・必要な音声を整え、102秒の字幕付き動画と匿名PDF下書きを最終確認する。
+- 提出用動画は日本語字幕で説明し、音声は付けていない。GitHub・動画URLのPDFへの記入は公開後に行う。
 - 個人情報のない公開GitHub、YouTube（限定公開以上）、OmniCampusへ提出する。これらの公開・提出操作は未実施。

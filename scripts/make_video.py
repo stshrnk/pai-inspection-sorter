@@ -4,6 +4,7 @@
   python3 scripts/make_video.py recordings/demo/frames recordings/demo.mp4 --fps 20
   python3 scripts/make_video.py recordings/demo/frames recordings/demo_captioned.mp4 \
     --metrics artifacts/evaluation20/metrics.json --trials 3 --gamma 1.6
+  python3 scripts/make_video.py --submission
 
 Frame names are frame_000000.png, frame_000001.png, ... . Input PNGs remain
 unchanged. Gamma is a display-only video adjustment; classifier inputs retain
@@ -19,6 +20,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 
 LABELS = {'good', 'defect', 'review'}
 SAFE_CAPTION = re.compile(r'[A-Za-z0-9 .()=|/+\-]+\Z')
@@ -169,4 +171,8 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    if '--submission' in sys.argv[1:]:
+        from submission_video import main as build_submission
+        build_submission([arg for arg in sys.argv[1:] if arg != '--submission'])
+    else:
+        main()

@@ -12,3 +12,6 @@ recordings/
 .env
 *.pem
 *.key
+
+# local visual-check renders
+review/submission/
